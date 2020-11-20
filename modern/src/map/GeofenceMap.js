@@ -18,13 +18,16 @@ const GeofenceMap = () => {
   }, []);
 
   useEffect(() => {
-    map.addSource(id, {
-      'type': 'geojson',
-      'data': {
-        type: 'FeatureCollection',
-        features: []
-      }
-    });
+    try {
+      map.addSource(id, {
+        'type': 'geojson',
+        'data': {
+          type: 'FeatureCollection',
+          features: []
+        }
+      });
+    } catch(e) {}
+
     map.addLayer({
       'source': id,
       'id': 'geofences-fill',
@@ -67,7 +70,7 @@ const GeofenceMap = () => {
       map.removeLayer('geofences-fill');
       map.removeLayer('geofences-line');
       map.removeLayer('geofences-title');
-      map.removeSource(id);
+      try {map.removeSource(id);} catch(e) {}
     };
   }, []);
 

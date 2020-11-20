@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { sessionActions } from './store';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Paper from '@material-ui/core/Paper';
@@ -44,15 +42,18 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const LoginPage = () => {
-  const dispatch = useDispatch();
-
+const RegisterPage = () => {
   const [failed, setFailed] = useState(false);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const classes = useStyles();
   const history = useHistory();
+
+  const handleNameChange = (event) => {
+    setName(event.target.value);
+  }
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -62,30 +63,50 @@ const LoginPage = () => {
     setPassword(event.target.value);
   }
 
-  const gotoRegister = (e) => {
-    e.preventDefault();
-    history.replace('register');
-  }
-
-  const handleLogin = async (event) => {
+  const handleRegister = async (event) => {console.log('asdfasfasdf')
     event.preventDefault();
-    const response = await fetch('/api/session', { method: 'POST', body: new URLSearchParams(`email=${email}&password=${password}`) });
+    const data = {
+        name: name,
+        email: email,
+        password: password
+    }
+    const response = await fetch('/api/users', {
+        method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data) 
+    });
     if (response.ok) {
-      const user = await response.json();
-      dispatch(sessionActions.updateUser(user));
-      history.push('/');
+      history.replace('/login');
     } else {
       setFailed(true);
       setPassword('');
     }
   }
 
+  const gotoLogin = (e) => {
+    e.preventDefault()
+    history.replace('login')
+  }
+
   return (
     <main className={classes.root}>
       <Paper className={classes.paper}>
         <img className={classes.logo} src='/logo.png' alt='Geolynx' />
-        <Typography variant="h5" gutterBottom style={{marginBottom:0}}>Login</Typography>
-        <form onSubmit={handleLogin}>
+        <Typography variant="h5" gutterBottom style={{marginBottom:0}}>Register</Typography>
+        <form onSubmit={handleRegister}>
+          <TextField
+            margin='normal'
+            required
+            fullWidth
+            error={failed}
+            label={t('userName')}
+            name='name'
+            value={name}
+            autoFocus
+            onChange={handleNameChange}
+            helperText={failed && 'Invalid name'} />
 
           <TextField
             margin='normal'
@@ -95,10 +116,8 @@ const LoginPage = () => {
             label={t('userEmail')}
             name='email'
             value={email}
-            autoComplete='email'
-            autoFocus
             onChange={handleEmailChange}
-            helperText={failed && 'Invalid username or password'} />
+            helperText={failed && 'Invalid email'} />
 
           <TextField
             margin='normal'
@@ -109,20 +128,20 @@ const LoginPage = () => {
             name='password'
             value={password}
             type='password'
-            autoComplete='current-password'
-            onChange={handlePasswordChange} />
+            onChange={handlePasswordChange}
+            helperText={failed && 'Invalid password'} />
 
           <FormControl fullWidth margin='normal'>
             <div className={classes.buttons}>
-              <Button type='submit' variant='contained' color='primary' disabled={!email || !password}>
-                {t('loginLogin')}
+              <Button type='submit' variant='contained'>
+                {t('loginRegister')}
               </Button>
             </div>
           </FormControl>
           <FormControl fullWidth margin='normal'>
             <div className={classes.buttons}>
               <Typography>
-                <Link href="#" onClick={gotoRegister}>{t('loginRegister')}</Link>
+                <Link href="#" onClick={gotoLogin}>{t('loginLogin')}</Link>
               </Typography>
             </div>
           </FormControl>
@@ -132,4 +151,4 @@ const LoginPage = () => {
   );
 }
 
-export default LoginPage;
+export default RegisterPage;

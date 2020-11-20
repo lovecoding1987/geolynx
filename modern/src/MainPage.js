@@ -1,7 +1,9 @@
 import React from 'react';
 import { isWidthUp, makeStyles, withWidth } from '@material-ui/core';
 import Drawer from '@material-ui/core/Drawer';
-import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+
 import ContainerDimensions from 'react-container-dimensions';
 import DevicesList from './DevicesList';
 import MainToolbar from './MainToolbar';
@@ -58,11 +60,22 @@ const MainPage = ({ width }) => {
     setState({ ...state, openDevicesList: open });
   };
 
+  const fabStyle = {
+      margin: 0,
+      top: '50%',
+      left: -20,
+      position: 'fixed',
+      zIndex: 1199,
+      paddingLeft: 10,
+      opacity: 0.6
+  }
   return (
     <div className={classes.root}>
       <MainToolbar />
       <div className={classes.content}>
-        <Button onClick={toggleDevicesList(true)}>...</Button>
+        <Fab size="small" color="primary" aria-label="add" onClick={toggleDevicesList(true)} style={fabStyle}>
+          <ArrowForwardIosIcon />
+        </Fab>
         <Drawer
           anchor={anchor}
           open={state.openDevicesList} 

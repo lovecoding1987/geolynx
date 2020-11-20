@@ -47,6 +47,6 @@ export const styleCarto = () => ({
   ]
 });
 
-export const styleMapbox = (style) => `mapbox://styles/mapbox/${style}`;
+export const styleMapbox = (style) => `mapbox://styles/inclanfunk/${style}`;
 
 export const styleMapTiler = (style, key) => `https://api.maptiler.com/maps/${style}/style.json?key=${key}`;

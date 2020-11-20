@@ -1,22 +1,17 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './switcher/switcher.css';
 import mapboxgl from 'mapbox-gl';
+import MapView from './MapView';
 import { SwitcherControl } from './switcher/switcher';
 import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
 import { deviceCategories } from '../common/deviceCategories';
 import { loadIcon, loadImage } from './mapUtil';
-import { styleCarto, styleMapbox, styleOsm } from './mapStyles';
+import { styleMapbox, styleOsm } from './mapStyles';
 import t from '../common/localization';
 import { useAttributePreference } from '../common/preferences';
 
-const element = document.createElement('div');
-element.style.width = '100%';
-element.style.height = '100%';
-
-export const map = new mapboxgl.Map({
-  container: element,
-  style: styleOsm(),
-});
+const mapView = new MapView();
+export const map = mapView.getMap();
 
 let ready = false;
 const readyListeners = new Set();
@@ -38,40 +33,72 @@ const updateReadyValue = value => {
 const initMap = async () => {
   const background = await loadImage('images/background.svg');
   await Promise.all(deviceCategories.map(async category => {
-    if (!map.hasImage(category)) {
+    if (!mapView.hasImage(category)) {
       const imageData = await loadIcon(category, background, `images/icon/${category}.svg`);
-      map.addImage(category, imageData, { pixelRatio: window.devicePixelRatio });
+      mapView.addImage(category, imageData, { pixelRatio: window.devicePixelRatio });
     }
   }));
   updateReadyValue(true);
 };
 
-map.on('load', initMap);
+mapView.on('load', initMap);
 
-map.addControl(new mapboxgl.NavigationControl({
+/*mapView.addControl(new mapboxgl.NavigationControl({
   showCompass: false,
-}));
+}));*/
 
-map.addControl(new SwitcherControl(
+mapView.addControl(new SwitcherControl(
   [
-    { title: t('mapOsm'), uri: styleOsm() },
-    { title: t('mapCarto'), uri: styleCarto() },
-    { title: t('mapMapboxStreets'), uri: styleMapbox('streets-v11') },
-    { title: t('mapMapboxOutdoors'), uri: styleMapbox('outdoors-v11') },
-    { title: t('mapMapboxSatellite'), uri: styleMapbox('satellite-v9') },
-    
+    { id: 'mapOsm', title: t('mapOsm'), uri: styleOsm() },
+    {
+      id: 'mapGoogle', title: t('google'), uri: ''
+    }, 
+    {
+      title: t('mapbox'),
+      items: [
+        { id: 'mapMapboxGround', title: t('ground'), uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
+        { id: 'mapMapboxVegetation', title: t('vegetation'), uri: styleMapbox('ckgh3eou302i219pbebto8f0c') },
+        { id: 'mapMapboxApplications', title: t('applications'), uri: styleMapbox('ckhhgcqyq08or19mixazio9js') },
+        { id: 'mapMapboxDemo', title: t('demo'), uri: styleMapbox('ckhl25qo906em19mcaj1x2evp') }
+      ]
+    },
+    {
+      title: t('weather'),
+      items: [
+        { id: 'mapWinds', title: t('winds'), uri: ''},
+        { id: 'mapTemperatures', title: t('temperatures'), uri: ''},
+      ]
+    }, 
+    {
+      title: t('hot_spots'),
+      items: [
+        { id: 'mapVIIRS-24hrs', title: `${t('VIIRS')} 24 hrs`, uri: '' },
+        { id: 'mapVIIRS-48hrs', title: `${t('VIIRS')} 48 hrs`, uri: '' },
+        { id: 'mapVIIRS-72hrs', title: `${t('VIIRS')} 72 hrs`, uri: '' },
+        { id: 'mapVIIRS-7days', title: `${t('VIIRS')} 7 days`, uri: '' },
+        { id: 'mapModis-24hrs', title: `${t('Modis')} 24 hrs`, uri: '' },
+        { id: 'mapModis-48hrs', title: `${t('Modis')} 48 hrs`, uri: '' },
+        { id: 'mapModis-72hrs', title: `${t('Modis')} 72 hrs`, uri: '' },
+        { id: 'mapModis-7days', title: `${t('Modis')} 7 days`, uri: '' },
+      ]
+    }    
   ],
-  t('mapOsm'),
-  () => updateReadyValue(false),
+  'mapOsm',
+  (styleId) => {
+    mapView.setMap(styleId);
+    updateReadyValue(false)
+  },
   () => {
-    const waiting = () => {
-      if (!map.loaded()) {
-        setTimeout(waiting, 100);
-      } else {
-        initMap();
-      }
-    };
-    waiting();
+    setTimeout(() => {
+      const waiting = () => {
+        if (!mapView.loaded()) {
+          setTimeout(waiting, 100);
+        } else {
+          initMap();
+        }
+      };
+      waiting();
+    }, 300)
   },
 ));
 
@@ -81,6 +108,16 @@ const Map = ({ children }) => {
   const [mapReady, setMapReady] = useState(false);
 
   const mapboxAccessToken = useAttributePreference('mapboxAccessToken');
+  
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = "/windy.js";
+    script.async = true;
+    document.body.appendChild(script);
+  return () => {
+      document.body.removeChild(script);
+    }
+  }, []);
 
   useEffect(() => {
     mapboxgl.accessToken = mapboxAccessToken;
@@ -91,17 +128,17 @@ const Map = ({ children }) => {
     addReadyListener(listener);
     return () => {
       removeReadyListener(listener);
+      document.getElementById('windy').style.visibility = 'hidden';
+      document.getElementById('mapbox').style.visibility = 'visible';
     };
   }, []);
 
   useLayoutEffect(() => {
     const currentEl = containerEl.current;
-    currentEl.appendChild(element);
-    if (map) {
-      map.resize();
-    }
+    currentEl.appendChild(mapView.getContainer());
+    mapView.resize();
     return () => {
-      currentEl.removeChild(element);
+      currentEl.removeChild(mapView.getContainer());
     };
   }, [containerEl]);
 

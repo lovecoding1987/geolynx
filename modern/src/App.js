@@ -3,6 +3,7 @@ import { Switch, Route } from 'react-router-dom'
 import CssBaseline from '@material-ui/core/CssBaseline';
 import MainPage from './MainPage';
 import LoginPage from './LoginPage';
+import RegisterPage from './RegisterPage';
 import RouteReportPage from './reports/RouteReportPage';
 import ServerPage from './admin/ServerPage';
 import UsersPage from './admin/UsersPage';
@@ -31,6 +32,7 @@ const App = () => {
       <SocketController />
       <Switch>
         <Route exact path='/login' component={LoginPage} />
+        <Route exact path='/register' component={RegisterPage} />
         <Route>
           {!initialized ? (<LinearProgress />) : (
             <Switch>

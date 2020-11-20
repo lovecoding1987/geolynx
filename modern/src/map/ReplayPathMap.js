@@ -6,16 +6,19 @@ const ReplayPathMap = ({ positions }) => {
   const id = 'replay';
 
   useEffect(() => {
-    map.addSource(id, {
-      'type': 'geojson',
-      'data': {
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: [],
+    try {
+      map.addSource(id, {
+        'type': 'geojson',
+        'data': {
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: [],
+          },
         },
-      },
-    });
+      });
+    } catch(e) {}
+
     map.addLayer({
       'source': id,
       'id': id,
@@ -32,7 +35,7 @@ const ReplayPathMap = ({ positions }) => {
 
     return () => {
       map.removeLayer(id);
-      map.removeSource(id);
+      try {map.removeSource(id);} catch(e) {}
     };
   }, []);
 

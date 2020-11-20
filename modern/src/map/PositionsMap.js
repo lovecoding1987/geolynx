@@ -51,13 +51,16 @@ const PositionsMap = ({ positions }) => {
   }, [history]);
 
   useEffect(() => {
-    map.addSource(id, {
-      'type': 'geojson',
-      'data': {
-        type: 'FeatureCollection',
-        features: [],
-      }
-    });
+    try {
+      map.addSource(id, {
+        'type': 'geojson',
+        'data': {
+          type: 'FeatureCollection',
+          features: [],
+        }
+      });
+    } catch(e) {}
+
     map.addLayer({
       'id': id,
       'type': 'symbol',
@@ -90,7 +93,7 @@ const PositionsMap = ({ positions }) => {
       map.off('click', id, onClickCallback);
 
       map.removeLayer(id);
-      map.removeSource(id);
+      try {map.removeSource(id);} catch(e) {}
     };
   }, [onClickCallback]);
 

@@ -15,13 +15,16 @@ const AccuracyMap = () => {
   }));
 
   useEffect(() => {
-    map.addSource(id, {
-      'type': 'geojson',
-      'data': {
-        type: 'FeatureCollection',
-        features: []
-      }
-    });
+    try {
+      map.addSource(id, {
+        'type': 'geojson',
+        'data': {
+          type: 'FeatureCollection',
+          features: []
+        }
+      });
+    } catch(e) {}
+
     map.addLayer({
       'source': id,
       'id': id,
@@ -39,7 +42,7 @@ const AccuracyMap = () => {
 
     return () => {
       map.removeLayer(id);
-      map.removeSource(id);
+      try {map.removeSource(id);} catch(e) {}
     };
   }, []);
 
