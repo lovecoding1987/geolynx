@@ -63,7 +63,7 @@ const RegisterPage = () => {
     setPassword(event.target.value);
   }
 
-  const handleRegister = async (event) => {console.log('asdfasfasdf')
+  const handleRegister = async (event) => {
     event.preventDefault();
     const data = {
         name: name,
