@@ -72,20 +72,21 @@ mapView.addControl(new SwitcherControl(
     {
       title: t('hot_spots'),
       items: [
-        { id: 'mapVIIRS-24hrs', title: `${t('VIIRS')} 24 hrs`, uri: '' },
-        { id: 'mapVIIRS-48hrs', title: `${t('VIIRS')} 48 hrs`, uri: '' },
-        { id: 'mapVIIRS-72hrs', title: `${t('VIIRS')} 72 hrs`, uri: '' },
-        { id: 'mapVIIRS-7days', title: `${t('VIIRS')} 7 days`, uri: '' },
-        { id: 'mapModis-24hrs', title: `${t('Modis')} 24 hrs`, uri: '' },
-        { id: 'mapModis-48hrs', title: `${t('Modis')} 48 hrs`, uri: '' },
-        { id: 'mapModis-72hrs', title: `${t('Modis')} 72 hrs`, uri: '' },
-        { id: 'mapModis-7days', title: `${t('Modis')} 7 days`, uri: '' },
+        { id: 'mapModis-24hrs', title: `${t('Modis')} 24 hrs`, uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
+        { id: 'mapModis-48hrs', title: `${t('Modis')} 48 hrs`, uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
+        { id: 'mapModis-7days', title: `${t('Modis')} 7 days`, uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
+        { id: 'mapVIIRS-S-NPP-24hrs', title: 'VIIRS S-NPP 24 hrs', uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
+        { id: 'mapVIIRS-S-NPP-48hrs', title: 'VIIRS S-NPP 48 hrs', uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
+        { id: 'mapVIIRS-S-NPP-7days', title: 'VIIRS S-NPP 7 days', uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
+        { id: 'mapVIIRS-NOAA-20-24hrs', title: 'VIIRS NOAA-20 24 hrs', uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
+        { id: 'mapVIIRS-NOAA-20-48hrs', title: 'VIIRS NOAA-20 48 hrs', uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
+        { id: 'mapVIIRS-NOAA-20-7days', title: 'VIIRS NOAA-20 7 days', uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
       ]
     }    
   ],
   'mapOsm',
   (styleId) => {
-    mapView.setMap(styleId);
+    mapView.setMapByStyle(styleId);
     updateReadyValue(false)
   },
   () => {
@@ -118,6 +119,18 @@ const Map = ({ children }) => {
       document.body.removeChild(script);
     }
   }, []);
+
+  useEffect(() => {   
+    const onSetWindyMap = (e) => {
+      mapView.setWindyMap(e.detail.map);
+      mapView.setWindyStore(e.detail.store)
+    }
+    document.addEventListener('setWindyMap', onSetWindyMap, false);
+
+    return () => {
+      document.removeEventListener("setWindyMap", onSetWindyMap);
+    }
+  })
 
   useEffect(() => {
     mapboxgl.accessToken = mapboxAccessToken;

@@ -12,7 +12,7 @@ const options = {
 windyInit(options, windyAPI => {
     const { store, map } = windyAPI;
 
-    onChangeMapStyle = (e) => { console.log(e.detail)
+    onChangeMapStyle = (e) => { 
         const {styleId, center, zoom} = e.detail
         map.setView(new L.LatLng(center.lat, center.lng), zoom);
         if (styleId === 'mapWinds') {
@@ -27,4 +27,18 @@ windyInit(options, windyAPI => {
     } else {
         document.attachEvent('changeMapStyle', onChangeMapStyle);
     }
+
+    document.dispatchEvent(new CustomEvent('setWindyMap', {
+      detail: {
+        map: map,
+        store: store
+      }
+    }));
+
+
+    document.getElementById('bottom').style.zIndex = 400;
+    document.getElementById('logo-wrapper').remove();
+    document.getElementById('mobile-ovr-select').remove();
+    document.getElementById('embed-zoom').remove();
+    document.getElementById('windy-app-promo').remove();
 });

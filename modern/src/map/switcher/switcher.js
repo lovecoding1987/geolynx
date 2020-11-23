@@ -1,5 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import config from '../../config'
+import { fetchFIRMS } from '../FetchFIRMS';
 export class SwitcherControl {
 
   constructor(styles, defaultStyle, beforeSwitch, afterSwitch) {
@@ -47,14 +48,18 @@ export class SwitcherControl {
         const styleId = event.target.dataset.id;
         if (!styleId) return; // If parent menu then just return;
 
-        me.beforeSwitch();
+        
+        const previousZoom = mapView.getZoom();
+        const previousCenter = mapView.getCenter();
+
+        me.beforeSwitch(styleId);
         
         const srcElement = event.srcElement;
         if (srcElement.classList.contains('active')) {
           return;
         }
 
-        if (styleId === 'mapWinds' || styleId === 'mapTemperatures') {console.log(mapView.map.getCenter())
+        if (styleId === 'mapWinds' || styleId === 'mapTemperatures') {
           // Windy map
           document.getElementById('windy').style.visibility = 'visible';
           document.getElementById('mapbox').style.visibility = 'hidden';
@@ -62,8 +67,8 @@ export class SwitcherControl {
           document.dispatchEvent(new CustomEvent('changeMapStyle', {
             detail: {
               styleId: styleId,
-              zoom: mapView.map.getZoom(),
-              center: mapView.map.getCenter()
+              zoom: previousZoom,
+              center: previousCenter
             }
           }));
         } else {
@@ -72,7 +77,34 @@ export class SwitcherControl {
           document.getElementById('mapbox').style.visibility = 'visible';             
           
           mapboxgl.accessToken = config.MAPBOX_ACCESS_TOKEN;
-          mapView.map.setStyle(JSON.parse(srcElement.dataset.uri));          
+          mapView.map.setStyle(JSON.parse(srcElement.dataset.uri));   
+
+          mapView.map.flyTo({
+            center: [previousCenter.lng, previousCenter.lat],
+            zoom: previousZoom
+          })
+
+          switch (styleId) {
+            case 'mapModis-24hrs':
+              fetchFIRMS('/data/active_fire/c6/csv/MODIS_C6_South_America_24h.csv', mapView); break;
+            case 'mapModis-48hrs':
+              fetchFIRMS('/data/active_fire/c6/csv/MODIS_C6_South_America_48h.csv', mapView); break;
+            case 'mapModis-7days':
+              fetchFIRMS('/data/active_fire/c6/csv/MODIS_C6_South_America_7d.csv', mapView); break;
+            case 'mapVIIRS-S-NPP-24hrs':
+              fetchFIRMS('/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_America_24h.csv', mapView); break;
+            case 'mapVIIRS-S-NPP-48hrs':
+              fetchFIRMS('/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_America_48h.csv', mapView); break;
+            case 'mapVIIRS-S-NPP-7days':
+              fetchFIRMS('/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_America_7d.csv', mapView); break;
+            case 'mapVIIRS-NOAA-20-24hrs':
+              fetchFIRMS('/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_South_America_24h.csv', mapView); break;
+            case 'mapVIIRS-NOAA-20-48hrs':
+              fetchFIRMS('/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_South_America_48h.csv', mapView); break;
+            case 'mapVIIRS-NOAA-20-7days':
+              fetchFIRMS('/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_South_America_7d.csv', mapView); break;
+            default:
+          }
         }
         me.afterSwitch();
         me.mapStyleContainer.style.display = 'none';
@@ -94,7 +126,7 @@ export class SwitcherControl {
       addStyleItemButton(style);
 
       if (style.items) {
-        for (const s of style.items) {console.log(s)
+        for (const s of style.items) {
           addStyleItemButton(s, true);
         }
       }

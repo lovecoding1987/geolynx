@@ -16,12 +16,11 @@ export default class MapView {
 
         this.container.appendChild(this.mapboxContainer);
 
-        this.mapList = {
-            'mapbox' : new mapboxgl.Map({
-                container: this.mapboxContainer,
-                style: styleOsm(),
-            })
-        }
+        this.mapboxMap = new mapboxgl.Map({
+            container: this.mapboxContainer,
+            style: styleOsm(),
+            animate: false
+        });
 
         this.windyContainer = document.createElement('div');
         this.windyContainer.id = 'windy';
@@ -29,12 +28,18 @@ export default class MapView {
         this.windyContainer.style.height = '100%';
 
         this.container.appendChild(this.windyContainer); 
+        
+        this.map = this.mapboxMap
 
-        this.map = this.mapList['mapbox'];
+        this.mapProvider = 'mapbox'
     }
 
     getMap() {
-        return this.map;
+        switch(this.mapProvider) {
+            case 'mapbox': return this.mapboxMap;
+            case 'windy': return this.windyMap;
+            case 'google': return this.googleMap;
+        }
     }
 
     getContainer() {
@@ -51,7 +56,10 @@ export default class MapView {
     }
 
     loaded() {
-        return this.map.loaded();
+        if (this.mapProvider === 'mapbox')
+            return this.map.loaded();
+
+        return true;
     }
 
     resize() {
@@ -59,14 +67,47 @@ export default class MapView {
     }
 
     hasImage(name) {
-        return this.map.hasImage(name);
+        if (this.mapProvider === 'mapbox')
+            return this.map.hasImage(name);
+
+        return true;
     }
 
     addImage(name, data, option) {
+        if (this.mapProvider !== 'mapbox') return;
         this.map.addImage(name, data, option);
     }
 
-    setMap(styleId) {
-        this.map = this.mapList['mapbox'];
+    setMapByStyle(styleId) {
+        if (styleId === 'mapWinds' || styleId === 'mapTemperatures') {
+            this.map = this.windyMap;
+            this.mapProvider = 'windy';
+        } else if (styleId === 'mapGoogle') {
+            this.map = this.googleMap;
+            this.mapProvider = 'google';
+        } else {
+            this.map = this.mapboxMap;
+            this.mapProvider = 'mapbox';
+        }
+    }
+
+    getZoom() {
+        return this.map.getZoom()
+    }
+
+    getCenter() {
+        return this.map.getCenter()
+    }
+
+    setWindyMap(map) {
+        this.windyMap = map;
+    }
+
+    setWindyStore(store) {
+        this.windyStore = store;
+    }
+
+    setMapProvider(provider) {
+        this.mapProvider = provider;
     }
 }
