@@ -79,10 +79,8 @@ export class SwitcherControl {
           mapboxgl.accessToken = config.MAPBOX_ACCESS_TOKEN;
           mapView.map.setStyle(JSON.parse(srcElement.dataset.uri));   
 
-          mapView.map.flyTo({
-            center: [previousCenter.lng, previousCenter.lat],
-            zoom: previousZoom
-          })
+          mapView.map.setCenter([previousCenter.lng, previousCenter.lat]);
+          mapView.map.setZoom(previousZoom);
 
           switch (styleId) {
             case 'mapModis-24hrs':
