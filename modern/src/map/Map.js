@@ -1,6 +1,8 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './switcher/switcher.css';
 import mapboxgl from 'mapbox-gl';
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import MapView from './MapView';
 import { SwitcherControl } from './switcher/switcher';
 import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
@@ -11,7 +13,48 @@ import t from '../common/localization';
 import { useAttributePreference } from '../common/preferences';
 
 const mapView = new MapView();
-export const map = mapView.getMap();
+export const map = mapView.mapboxMap;
+
+const Draw = new MapboxDraw({
+  controls: {
+    combine_features: false,
+    uncombine_features: false,
+  }
+});
+
+map.addControl(Draw, 'bottom-right');
+
+Draw.add({
+  "type": "Feature",
+  "properties": {
+    "marker-color": "#7e7e7e",
+    "marker-size": "medium",
+    "marker-symbol": "triangle"
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      131.396484375,
+      66.72254132270653
+    ]
+  }
+});
+
+Draw.add({
+  "type": "Feature",
+  "properties": {
+    "marker-color": "#7e7e7e",
+    "marker-size": "medium",
+    "marker-symbol": "embassy"
+  },
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      101.513671875,
+      65.6582745198266
+    ]
+  }
+})
 
 let ready = false;
 const readyListeners = new Set();
@@ -38,7 +81,7 @@ const initMap = async () => {
       mapView.addImage(category, imageData, { pixelRatio: window.devicePixelRatio });
     }
   }));
-  updateReadyValue(true);
+  //updateReadyValue(true);
 };
 
 mapView.on('load', initMap);

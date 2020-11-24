@@ -22,6 +22,7 @@ export default class MapView {
             animate: false
         });
 
+
         this.windyContainer = document.createElement('div');
         this.windyContainer.id = 'windy';
         this.windyContainer.style.width = '100%';
@@ -36,9 +37,11 @@ export default class MapView {
 
     getMap() {
         switch(this.mapProvider) {
-            case 'mapbox': return this.mapboxMap;
             case 'windy': return this.windyMap;
             case 'google': return this.googleMap;
+            case 'mapbox': 
+            default: 
+            return this.mapboxMap;
         }
     }
 

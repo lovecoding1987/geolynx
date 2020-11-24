@@ -10,7 +10,12 @@ const options = {
 
 // Initialize Windy API
 windyInit(options, windyAPI => {
-    const { store, map } = windyAPI;
+    const { store, map, picker } = windyAPI;
+
+    map.on('mousedown', function(e) {
+        const {lat, lng} = e.latlng;
+        picker.open({ lat: lat, lon: lng });
+    })
 
     onChangeMapStyle = (e) => { 
         const {styleId, center, zoom} = e.detail

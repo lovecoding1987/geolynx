@@ -4,12 +4,10 @@ export const fetchFIRMS = (url, mapView) => {
     fetch(url).then((res) => {
         res.text()
             .then((data) => {
-                console.log(data);
                 parse(data.trim(), {
                     columns: true,
                     from_line: 1
                 }, function (err, records) {
-                    console.log(records)
                     if (err) return;
 
                     const features = records.map(record => ({
@@ -20,8 +18,7 @@ export const fetchFIRMS = (url, mapView) => {
                         },
                         properties: null
                     }))
-                    console.log(features)
-                    const map = mapView.map;
+                    const map = mapView.mapboxMap;
                     map.loadImage(
                         '/images/fire.png',
                         function (error, image) {
