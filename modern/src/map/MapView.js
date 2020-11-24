@@ -1,10 +1,28 @@
 import mapboxgl from 'mapbox-gl';
-import {styleOsm} from './mapStyles';
+import { styleOsm } from './mapStyles';
+import { deviceCategories, firmsCategories } from '../common/icons';
+import { loadMapImage } from './mapUtil';
 
+
+
+export const initMapboxMap = async (map) => {
+
+    await Promise.all(deviceCategories.map(async category => {
+        if (!map.hasImage(`${category}_blue`)) map.addImage(`${category}_blue`, await loadMapImage(map, `images/icon/${category}_blue.png`), { pixelRatio: window.devicePixelRatio });
+        if (!map.hasImage(`${category}_green`)) map.addImage(`${category}_green`, await loadMapImage(map, `images/icon/${category}_green.png`), { pixelRatio: window.devicePixelRatio });
+        if (!map.hasImage(`${category}_grey`)) map.addImage(`${category}_grey`, await loadMapImage(map, `images/icon/${category}_grey.png`), { pixelRatio: window.devicePixelRatio });
+        if (!map.hasImage(`${category}_orange`)) map.addImage(`${category}_orange`, await loadMapImage(map, `images/icon/${category}_orange.png`), { pixelRatio: window.devicePixelRatio });
+    }));
+
+    await Promise.all(firmsCategories.map(async category => {
+        const imagename = `fire_${category}`; 
+        if (!map.hasImage(imagename)) map.addImage(imagename, await loadMapImage(map, `images/${imagename}.png`), { pixelRatio: window.devicePixelRatio });        
+    }));
+};
 
 export default class MapView {
-    constructor () {
-        this.container = document.createElement('div');        
+    constructor() {
+        this.container = document.createElement('div');
         this.container.style.width = '100%';
         this.container.style.height = '100%';
         this.container.style.position = 'relative';
@@ -22,26 +40,27 @@ export default class MapView {
             animate: false
         });
 
+        this.mapboxMap.on('load', () => initMapboxMap(this.mapboxMap));
 
         this.windyContainer = document.createElement('div');
         this.windyContainer.id = 'windy';
         this.windyContainer.style.width = '100%';
         this.windyContainer.style.height = '100%';
 
-        this.container.appendChild(this.windyContainer); 
-        
+        this.container.appendChild(this.windyContainer);
+
         this.map = this.mapboxMap
 
         this.mapProvider = 'mapbox'
     }
 
     getMap() {
-        switch(this.mapProvider) {
+        switch (this.mapProvider) {
             case 'windy': return this.windyMap;
             case 'google': return this.googleMap;
-            case 'mapbox': 
-            default: 
-            return this.mapboxMap;
+            case 'mapbox':
+            default:
+                return this.mapboxMap;
         }
     }
 

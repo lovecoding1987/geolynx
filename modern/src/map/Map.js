@@ -3,11 +3,9 @@ import './switcher/switcher.css';
 import mapboxgl from 'mapbox-gl';
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
-import MapView from './MapView';
+import MapView, {initMapboxMap} from './MapView';
 import { SwitcherControl } from './switcher/switcher';
 import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
-import { deviceCategories } from '../common/deviceCategories';
-import { loadIcon, loadImage } from './mapUtil';
 import { styleMapbox, styleOsm } from './mapStyles';
 import t from '../common/localization';
 import { useAttributePreference } from '../common/preferences';
@@ -73,22 +71,6 @@ const updateReadyValue = value => {
   readyListeners.forEach(listener => listener(value));
 };
 
-const initMap = async () => {
-  const background = await loadImage('images/background.svg');
-  await Promise.all(deviceCategories.map(async category => {
-    if (!mapView.hasImage(category)) {
-      const imageData = await loadIcon(category, background, `images/icon/${category}.svg`);
-      mapView.addImage(category, imageData, { pixelRatio: window.devicePixelRatio });
-    }
-  }));
-  //updateReadyValue(true);
-};
-
-mapView.on('load', initMap);
-
-/*mapView.addControl(new mapboxgl.NavigationControl({
-  showCompass: false,
-}));*/
 
 mapView.addControl(new SwitcherControl(
   [
@@ -113,17 +95,40 @@ mapView.addControl(new SwitcherControl(
       ]
     }, 
     {
+      id: 'mapFIRMS',
       title: t('hot_spots'),
+      uri: styleMapbox('ckhvoc3ym0grz19k72icogk47'),
       items: [
-        { id: 'mapModis-24hrs', title: `${t('Modis')} 24 hrs`, uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
-        { id: 'mapModis-48hrs', title: `${t('Modis')} 48 hrs`, uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
-        { id: 'mapModis-7days', title: `${t('Modis')} 7 days`, uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
-        { id: 'mapVIIRS-S-NPP-24hrs', title: 'VIIRS S-NPP 24 hrs', uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
-        { id: 'mapVIIRS-S-NPP-48hrs', title: 'VIIRS S-NPP 48 hrs', uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
-        { id: 'mapVIIRS-S-NPP-7days', title: 'VIIRS S-NPP 7 days', uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
-        { id: 'mapVIIRS-NOAA-20-24hrs', title: 'VIIRS NOAA-20 24 hrs', uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
-        { id: 'mapVIIRS-NOAA-20-48hrs', title: 'VIIRS NOAA-20 48 hrs', uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
-        { id: 'mapVIIRS-NOAA-20-7days', title: 'VIIRS NOAA-20 7 days', uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
+        {
+          title: 'Modis', 
+          img: 'images/fire_modis.png',
+          checkboxes: true,
+          items:[
+            {id: 'mapModis-24hrs', title: '24 hrs'},
+            {id: 'mapModis-48hrs', title: '48 hrs'},
+            {id: 'mapModis-7days', title: '7 days'},
+          ]
+        },
+        {
+          title: 'VIIRS S-NPP', 
+          img: 'images/fire_viirs_snpp.png',
+          checkboxes: true,
+          items:[
+            {id: 'mapVIIRS-S-NPP-24hrs', title: '24 hrs'},
+            {id: 'mapVIIRS-S-NPP-48hrs', title: '48 hrs'},
+            {id: 'mapVIIRS-S-NPP-7days', title: '7 days'},
+          ]
+        },
+        {
+          title: 'VIIRS NOAA-20', 
+          img: 'images/fire_viirs_noaa.png',
+          checkboxes: true,
+          items:[
+            {id: 'mapVIIRS-NOAA-20-24hrs', title: '24 hrs'},
+            {id: 'mapVIIRS-NOAA-20-48hrs', title: '48 hrs'},
+            {id: 'mapVIIRS-NOAA-20-7days', title: '7 days'},
+          ]
+        }
       ]
     }    
   ],
@@ -138,7 +143,7 @@ mapView.addControl(new SwitcherControl(
         if (!mapView.loaded()) {
           setTimeout(waiting, 100);
         } else {
-          initMap();
+          initMapboxMap(map);
         }
       };
       waiting();

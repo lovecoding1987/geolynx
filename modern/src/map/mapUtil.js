@@ -1,3 +1,11 @@
+export const loadMapImage = (map, url) => new Promise((resolve, reject) => {
+  map.loadImage(url, function(err, image) {
+    if (err) return reject(err);
+
+    resolve(image)
+  })
+})
+
 export const loadImage = (url) => {
   return new Promise(imageLoaded => {
     const image = new Image();

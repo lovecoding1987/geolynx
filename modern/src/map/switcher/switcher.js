@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import config from '../../config'
-import { fetchFIRMS } from '../FetchFIRMS';
+import { addFireLayers, removeFireLayers } from '../FireLayers';
 export class SwitcherControl {
 
   constructor(styles, defaultStyle, beforeSwitch, afterSwitch) {
@@ -17,6 +17,8 @@ export class SwitcherControl {
 
   onAdd(mapView) {
     const me = this;
+    const map = mapView.mapboxMap;
+
     me.controlContainer = document.createElement('div');
     me.controlContainer.classList.add('mapboxgl-ctrl');
     me.controlContainer.classList.add('mapboxgl-ctrl-group');
@@ -40,20 +42,21 @@ export class SwitcherControl {
       const styleElement = document.createElement('button');
       styleElement.type = 'button';
       styleElement.innerText = style.title;
-      styleElement.classList.add(style.title.replace(/[^a-z0-9-]/gi, '_'));
+      styleElement.classList.add(style.id);
       if (indent) styleElement.classList.add('indent');
       styleElement.dataset.uri = JSON.stringify(style.uri);
       styleElement.dataset.id = style.id;
+
       styleElement.addEventListener('click', event => {
         const styleId = event.target.dataset.id;
         if (!styleId) return; // If parent menu then just return;
 
-        
+
         const previousZoom = mapView.getZoom();
         const previousCenter = mapView.getCenter();
 
         me.beforeSwitch(styleId);
-        
+
         const srcElement = event.srcElement;
         if (srcElement.classList.contains('active')) {
           return;
@@ -74,44 +77,30 @@ export class SwitcherControl {
         } else {
           // Mapbox map
           document.getElementById('windy').style.visibility = 'hidden';
-          document.getElementById('mapbox').style.visibility = 'visible';             
-          
+          document.getElementById('mapbox').style.visibility = 'visible';
+
           mapboxgl.accessToken = config.MAPBOX_ACCESS_TOKEN;
-          mapView.map.setStyle(JSON.parse(srcElement.dataset.uri));   
+          mapView.map.setStyle(JSON.parse(srcElement.dataset.uri));
 
           mapView.map.setCenter([previousCenter.lng, previousCenter.lat]);
           mapView.map.setZoom(previousZoom);
-
-          switch (styleId) {
-            case 'mapModis-24hrs':
-              fetchFIRMS('/data/active_fire/c6/csv/MODIS_C6_South_America_24h.csv', mapView); break;
-            case 'mapModis-48hrs':
-              fetchFIRMS('/data/active_fire/c6/csv/MODIS_C6_South_America_48h.csv', mapView); break;
-            case 'mapModis-7days':
-              fetchFIRMS('/data/active_fire/c6/csv/MODIS_C6_South_America_7d.csv', mapView); break;
-            case 'mapVIIRS-S-NPP-24hrs':
-              fetchFIRMS('/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_America_24h.csv', mapView); break;
-            case 'mapVIIRS-S-NPP-48hrs':
-              fetchFIRMS('/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_America_48h.csv', mapView); break;
-            case 'mapVIIRS-S-NPP-7days':
-              fetchFIRMS('/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_America_7d.csv', mapView); break;
-            case 'mapVIIRS-NOAA-20-24hrs':
-              fetchFIRMS('/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_South_America_24h.csv', mapView); break;
-            case 'mapVIIRS-NOAA-20-48hrs':
-              fetchFIRMS('/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_South_America_48h.csv', mapView); break;
-            case 'mapVIIRS-NOAA-20-7days':
-              fetchFIRMS('/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_South_America_7d.csv', mapView); break;
-            default:
-          }
         }
         me.afterSwitch();
-        me.mapStyleContainer.style.display = 'none';
-        me.styleButton.style.display = 'block';
+        //me.mapStyleContainer.style.display = 'none';
+        //me.styleButton.style.display = 'block';
+
         const elms = me.mapStyleContainer.getElementsByClassName('active');
         while (elms[0]) {
           elms[0].classList.remove('active');
         }
         srcElement.classList.add('active');
+
+        if (styleId !== 'mapFIRMS') {
+          const checkboxes = me.mapStyleContainer.getElementsByTagName('input');
+          for (const checkbox of checkboxes) {
+            checkbox.checked = false;
+          }
+        }
       });
 
       if (style.id === me.defaultStyle) {
@@ -120,17 +109,84 @@ export class SwitcherControl {
       me.mapStyleContainer.appendChild(styleElement);
     }
 
+    const addStyleItemWithCheckboxes = (style, indent) => {
+      const container = document.createElement('button');
+      container.classList.add(style.title.replace(/[^a-z0-9-]/gi, '_'));
+      if (indent) container.classList.add('indent');
+
+      const styleImg = document.createElement('img');
+      styleImg.src = style.img;
+      styleImg.style.width = '16px';
+      styleImg.style.verticalAlign = 'bottom';
+      styleImg.style.marginRight = '5px';
+      container.appendChild(styleImg);
+
+      const titleSpan = document.createElement('span');
+      titleSpan.innerText = style.title;
+      container.appendChild(titleSpan);
+
+      const checkboxesSpan = document.createElement('span');
+      checkboxesSpan.style.float = 'right';
+      checkboxesSpan.style.marginLeft = '5px';
+
+      for (const s of style.items) {
+        const checkboxSpan = document.createElement('span');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+
+        checkbox.dataset.id = s.id;
+        checkbox.innerText = s.title;
+        checkboxSpan.appendChild(checkbox);
+
+        const label = document.createElement('label');
+        label.for = s.id;
+        label.innerText = s.title;
+        checkboxSpan.appendChild(label);
+
+        checkboxesSpan.appendChild(checkboxSpan);
+
+        checkbox.addEventListener('change', event => {
+          if (me.mapStyleContainer.getElementsByClassName('active')[0].dataset.id !== 'mapFIRMS') {
+            me.mapStyleContainer.getElementsByClassName('mapFIRMS')[0].dispatchEvent(new Event('click'));
+          }
+
+          const source = event.target.dataset.id;
+
+          for (const checkbox of event.target.parentNode.parentNode.parentNode.getElementsByTagName('input')) {
+            if (checkbox !== event.target) {
+              checkbox.checked = false;
+              removeFireLayers(checkbox.dataset.id, map)
+            }
+          }
+
+          if (event.target.checked) {
+            addFireLayers(source, map, style.title);
+          } else {
+            removeFireLayers(source, map)
+          }
+        });
+      }
+      container.appendChild(checkboxesSpan);
+
+      me.mapStyleContainer.appendChild(container);
+    }
+
     for (const style of me.styles) {
       addStyleItemButton(style);
 
       if (style.items) {
         for (const s of style.items) {
-          addStyleItemButton(s, true);
+          if (s.checkboxes) {
+            addStyleItemWithCheckboxes(s, true);
+          } else {
+            addStyleItemButton(s, true);
+          }
         }
       }
     }
     me.controlContainer.appendChild(me.styleButton);
-    
+
     document.addEventListener('click', me.onDocumentClick);
     return me.controlContainer;
   }
