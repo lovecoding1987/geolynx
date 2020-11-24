@@ -1,7 +1,9 @@
 import mapboxgl from 'mapbox-gl';
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { styleOsm } from './mapStyles';
 import { deviceCategories, firmsCategories } from '../common/icons';
 import { loadMapImage } from './mapUtil';
+import GeoJsonControl from './GeoJsonControl';
 
 
 
@@ -15,9 +17,21 @@ export const initMapboxMap = async (map) => {
     }));
 
     await Promise.all(firmsCategories.map(async category => {
-        const imagename = `fire_${category}`; 
-        if (!map.hasImage(imagename)) map.addImage(imagename, await loadMapImage(map, `images/${imagename}.png`), { pixelRatio: window.devicePixelRatio });        
+        const imagename = `fire_${category}`;
+        if (!map.hasImage(imagename)) map.addImage(imagename, await loadMapImage(map, `images/${imagename}.png`), { pixelRatio: window.devicePixelRatio });
     }));
+
+    if (!map.hasImage('default-marker')) map.addImage('default-marker', await loadMapImage(map, 'images/marker.png'));
+
+    map.on('draw.create', function (e) {
+        console.log('>>>>>>>>>> draw.create', e)
+    })
+    map.on('draw.update', function (e) {
+        console.log('>>>>>>>>>> draw.update', e)
+    })
+    map.on('draw.delete', function (e) {
+        console.log('>>>>>>>>>> draw.delete', e)
+    })
 };
 
 export default class MapView {
@@ -41,6 +55,44 @@ export default class MapView {
         });
 
         this.mapboxMap.on('load', () => initMapboxMap(this.mapboxMap));
+
+
+        this.mapboxDraw = new MapboxDraw({
+            controls: {
+                combine_features: false,
+                uncombine_features: false,
+            },
+            userProperties: true,
+            // styles: [
+            //     {
+            //         'id': 'marker-draw-active',
+            //         'type': 'symbol',
+            //         'filter': ['all',
+            //             ['==', '$type', 'Point'],
+            //             ['==', 'meta', 'feature'],
+            //             ['==', 'active', 'true']],
+            //         'layout': {
+            //             'icon-image': 'default-marker'
+            //         },
+            //     },
+            //     {
+            //         'id': 'marker-draw-default',
+            //         'type': 'symbol',
+            //         'layout': {
+            //             'icon-image': 'default-marker'
+            //         },
+            //         'filter': ['all',
+            //             ['==', '$type', 'Point'],
+            //             ['==', 'meta', 'feature'],
+            //             ['==', 'active', 'false']],
+
+            //     }
+            // ]
+        });
+
+        this.mapboxMap.addControl(this.mapboxDraw, 'bottom-right');
+        this.mapboxMap.addControl(new GeoJsonControl(this.mapboxDraw), 'bottom-right');
+
 
         this.windyContainer = document.createElement('div');
         this.windyContainer.id = 'windy';
