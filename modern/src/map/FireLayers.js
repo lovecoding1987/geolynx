@@ -45,6 +45,7 @@ export const addFireLayers = async (source, map, title) => {
         default:
     }
 
+    if (!map.hasImage(icon)) map.addImage(icon, await loadMapImage(map, `images/${icon}.png`));
     
     const data = await fetch(url).then((res) => res.text());
 

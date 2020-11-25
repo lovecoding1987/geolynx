@@ -16,11 +16,6 @@ export const initMapboxMap = async (map) => {
         if (!map.hasImage(`${category}_orange`)) map.addImage(`${category}_orange`, await loadMapImage(map, `images/icon/${category}_orange.png`), { pixelRatio: window.devicePixelRatio });
     }));
 
-    await Promise.all(firmsCategories.map(async category => {
-        const imagename = `fire_${category}`;
-        if (!map.hasImage(imagename)) map.addImage(imagename, await loadMapImage(map, `images/${imagename}.png`), { pixelRatio: window.devicePixelRatio });
-    }));
-
     if (!map.hasImage('default-marker')) map.addImage('default-marker', await loadMapImage(map, 'images/marker.png'));
 
     map.on('draw.create', function (e) {
