@@ -34,9 +34,6 @@ mapView.addControl(new SwitcherControl(
   [
     { id: 'mapOsm', title: t('mapOsm'), uri: styleOsm() },
     {
-      id: 'mapGoogle', title: t('google'), uri: ''
-    }, 
-    {
       title: t('mapbox'),
       items: [
         { id: 'mapMapboxGround', title: t('ground'), uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
