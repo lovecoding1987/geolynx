@@ -1,5 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import parse from 'csv-parse';
+import { loadMapImage } from './mapUtil';
 
 export const addFireLayers = async (source, map, title) => {
     if (map.getSource(source)) return;
@@ -45,16 +46,16 @@ export const addFireLayers = async (source, map, title) => {
         default:
     }
 
-    if (!map.hasImage(icon)) map.addImage(icon, await loadMapImage(map, `images/${icon}.png`));
-    
     const data = await fetch(url).then((res) => res.text());
 
     parse(data.trim(), {
         columns: true,
         from_line: 1
-    }, function (err, records) {
+    }, async function (err, records) {
         if (err) return;
         
+        if (!map.hasImage(icon)) map.addImage(icon, await loadMapImage(map, `images/${icon}.png`));
+    
         const features = records.map(record => ({
             type: 'Feature',
             geometry: {
