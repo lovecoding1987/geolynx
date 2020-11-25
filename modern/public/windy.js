@@ -10,9 +10,10 @@ const options = {
 
 // Initialize Windy API
 windyInit(options, windyAPI => {
-    const { store, map, picker } = windyAPI;
+    const { store, map, picker, utils, overlays } = windyAPI;
 
-    map.on('mousedown', function(e) {
+    overlays.wind.setMetric('km/h')
+    map.on('click', function(e) {
         const {lat, lng} = e.latlng;
         picker.open({ lat: lat, lon: lng });
     })
