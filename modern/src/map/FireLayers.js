@@ -2,46 +2,57 @@ import mapboxgl from 'mapbox-gl';
 import parse from 'csv-parse';
 import { loadMapImage } from './mapUtil';
 
-export const addFireLayers = async (source, map, title) => {
-    if (map.getSource(source)) return;
+export const addFireLayers = async (source, map) => {
+    if (map.getSource(source)) {
+        map.setLayoutProperty(source, 'visibility', 'visible'); return;
+    };
 
-    let url, icon;
+    let url, icon, title;
     switch (source) {
         case 'mapModis-24hrs':
             url = '/data/active_fire/c6/csv/MODIS_C6_South_America_24h.csv'; 
             icon = 'fire_modis';
+            title = 'MODIS';
             break;
         case 'mapModis-48hrs':
             url = '/data/active_fire/c6/csv/MODIS_C6_South_America_48h.csv'; 
             icon = 'fire_modis';
+            title = 'MODIS';
             break;
         case 'mapModis-7days':
             url = '/data/active_fire/c6/csv/MODIS_C6_South_America_7d.csv'; 
             icon = 'fire_modis';
+            title = 'MODIS';
             break;
         case 'mapVIIRS-S-NPP-24hrs':
             url = '/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_America_24h.csv'; 
             icon = 'fire_viirs_snpp';
+            title = 'VIIRS Suomi NPP';
             break;
         case 'mapVIIRS-S-NPP-48hrs':
             url = '/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_America_48h.csv';
             icon = 'fire_viirs_snpp';
+            title = 'VIIRS Suomi NPP';
             break;
         case 'mapVIIRS-S-NPP-7days':
             url = '/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_America_7d.csv'; 
             icon = 'fire_viirs_snpp';
+            title = 'VIIRS Suomi NPP';
             break;
         case 'mapVIIRS-NOAA-20-24hrs':
             url = '/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_South_America_24h.csv'; 
             icon = 'fire_viirs_noaa';
+            title = 'VIIRS NOAA-20';
             break;
         case 'mapVIIRS-NOAA-20-48hrs':
             url = '/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_South_America_48h.csv'; 
             icon = 'fire_viirs_noaa';
+            title = 'VIIRS NOAA-20';
             break;
         case 'mapVIIRS-NOAA-20-7days':
             url = '/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_South_America_7d.csv'; 
             icon = 'fire_viirs_noaa';
+            title = 'VIIRS NOAA-20';
             break;
         default:
     }
@@ -128,9 +139,10 @@ export const addFireLayers = async (source, map, title) => {
 
 export const removeFireLayers = async (source, map) => {
     if (map.getLayer(source)) {
-        map.removeLayer(source);
-    }
-    if (map.getSource(source)) {
-        map.removeSource(source);
+        map.setLayoutProperty(
+            source,
+            'visibility',
+            'none'
+        )
     }
 }

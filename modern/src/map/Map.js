@@ -1,13 +1,10 @@
-import 'mapbox-gl/dist/mapbox-gl.css';
-import './switcher/switcher.css';
-import mapboxgl from 'mapbox-gl';
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import MapView, {initMapboxMap} from './MapView';
-import { SwitcherControl } from './switcher/switcher';
 import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
+import { SwitcherControl } from './switcher/switcher';
+import './switcher/switcher.css';
 import { styleMapbox, styleOsm } from './mapStyles';
 import t from '../common/localization';
-import { useAttributePreference } from '../common/preferences';
+import DrawPopover from '../DrawPopover';
 
 const mapView = new MapView();
 export const map = mapView.mapboxMap;
@@ -53,37 +50,10 @@ mapView.addControl(new SwitcherControl(
       id: 'mapFIRMS',
       title: t('hot_spots'),
       uri: styleMapbox('ckhvoc3ym0grz19k72icogk47'),
-      items: [
-        {
-          title: 'Modis', 
-          img: 'images/fire_modis.png',
-          checkboxes: true,
-          items:[
-            {id: 'mapModis-24hrs', title: '24 hrs'},
-            {id: 'mapModis-48hrs', title: '48 hrs'},
-            {id: 'mapModis-7days', title: '7 days'},
-          ]
-        },
-        {
-          title: 'VIIRS S-NPP', 
-          img: 'images/fire_viirs_snpp.png',
-          checkboxes: true,
-          items:[
-            {id: 'mapVIIRS-S-NPP-24hrs', title: '24 hrs'},
-            {id: 'mapVIIRS-S-NPP-48hrs', title: '48 hrs'},
-            {id: 'mapVIIRS-S-NPP-7days', title: '7 days'},
-          ]
-        },
-        {
-          title: 'VIIRS NOAA-20', 
-          img: 'images/fire_viirs_noaa.png',
-          checkboxes: true,
-          items:[
-            {id: 'mapVIIRS-NOAA-20-24hrs', title: '24 hrs'},
-            {id: 'mapVIIRS-NOAA-20-48hrs', title: '48 hrs'},
-            {id: 'mapVIIRS-NOAA-20-7days', title: '7 days'},
-          ]
-        }
+      checkboxes:[
+        {id: 'mapFIRMS-24hrs', title: '24 hrs'},
+        {id: 'mapFIRMS-48hrs', title: '48 hrs'},
+        {id: 'mapFIRMS-7days', title: '7 days'},
       ]
     }    
   ],
@@ -110,9 +80,10 @@ const Map = ({ children }) => {
   const containerEl = useRef(null);
 
   const [mapReady, setMapReady] = useState(false);
+  const [popoverData, setPopoverData] = useState(null);
 
-  const mapboxAccessToken = useAttributePreference('mapboxAccessToken');
   
+
   useEffect(() => {
     const script = document.createElement('script');
     script.src = "/windy.js";
@@ -136,8 +107,11 @@ const Map = ({ children }) => {
   })
 
   useEffect(() => {
-    mapboxgl.accessToken = mapboxAccessToken;
-  }, [mapboxAccessToken]);
+    mapView.mapboxMap.on('draw.selectionchange', (e) => {
+      const features = e.features;
+      setPopoverData(features.length > 0 ? features[0] : null);
+    })
+  })
 
   useEffect(() => {
     const listener = ready => setMapReady(ready);
@@ -158,9 +132,25 @@ const Map = ({ children }) => {
     };
   }, [containerEl]);
 
+  const popoverHandleClose = () => {
+    setPopoverData(null);
+  }
+
+  const setDrawMarkerIcon = (featureId, icon) => {
+    mapView.mapboxDraw.setFeatureProperty(featureId, 'icon', icon);
+  }
+
+  const popoverOpen = popoverData !== null;
   return (
     <div style={{ width: '100%', height: '100%' }} ref={containerEl}>
       {mapReady && children}
+
+      <DrawPopover
+        open={popoverOpen}
+        handleClose={popoverHandleClose}
+        data={popoverData}
+        setMarkerIcon={setDrawMarkerIcon}
+      />
     </div>
   );
 };

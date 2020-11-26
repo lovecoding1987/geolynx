@@ -1,8 +1,10 @@
+import 'mapbox-gl/dist/mapbox-gl.css';
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import mapboxgl from 'mapbox-gl';
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { styleOsm } from './mapStyles';
-import { deviceCategories, firmsCategories } from '../common/icons';
-import { loadMapImage } from './mapUtil';
+import { deviceCategories, markerIcons } from '../common/icons';
+import { loadMapImage, mapDrawStyles } from './mapUtil';
 import GeoJsonControl from './GeoJsonControl';
 
 
@@ -16,17 +18,11 @@ export const initMapboxMap = async (map) => {
         if (!map.hasImage(`${category}_orange`)) map.addImage(`${category}_orange`, await loadMapImage(map, `images/icon/${category}_orange.png`), { pixelRatio: window.devicePixelRatio });
     }));
 
-    if (!map.hasImage('default-marker')) map.addImage('default-marker', await loadMapImage(map, 'images/marker.png'));
+    await Promise.all(markerIcons.map(async icon => {
+        if (!map.hasImage(`marker-${icon}`)) map.addImage(`marker-${icon}`, await loadMapImage(map, `images/marker_${icon}.png`));        
+    }));
 
-    map.on('draw.create', function (e) {
-        console.log('>>>>>>>>>> draw.create', e)
-    })
-    map.on('draw.update', function (e) {
-        console.log('>>>>>>>>>> draw.update', e)
-    })
-    map.on('draw.delete', function (e) {
-        console.log('>>>>>>>>>> draw.delete', e)
-    })
+    if (!map.hasImage('marker-default')) map.addImage('marker-default', await loadMapImage(map, 'images/marker.png'));
 };
 
 export default class MapView {
@@ -43,6 +39,7 @@ export default class MapView {
 
         this.container.appendChild(this.mapboxContainer);
 
+        mapboxgl.accessToken = 'pk.eyJ1IjoiaW5jbGFuZnVuayIsImEiOiJja2dlNnM3MGIwNm4zMnlwaHo3M3J2bzU4In0.LUlcK4IiLIEY_ssxmzXgKQ';
         this.mapboxMap = new mapboxgl.Map({
             container: this.mapboxContainer,
             style: styleOsm(),
@@ -58,137 +55,11 @@ export default class MapView {
                 uncombine_features: false,
             },
             userProperties: true,
-            styles: [
-                {
-                    'id': 'marker-draw-active',
-                    'type': 'symbol',
-                    'filter': ['all',
-                        ['==', '$type', 'Point'],
-                        ['==', 'meta', 'feature'],
-                        ['==', 'active', 'true']],
-                    'layout': {
-                        'icon-image': 'default-marker'
-                    },
-                },
-                {
-                    'id': 'marker-draw-default',
-                    'type': 'symbol',
-                    'layout': {
-                        'icon-image': 'default-marker'
-                    },
-                    'filter': ['all',
-                        ['==', '$type', 'Point'],
-                        ['==', 'meta', 'feature'],
-                        ['==', 'active', 'false']],
-
-                },
-                // ACTIVE (being drawn)
-                // line stroke
-                {
-                    "id": "gl-draw-line",
-                    "type": "line",
-                    "filter": ["all", ["==", "$type", "LineString"], ["!=", "mode", "static"]],
-                    "layout": {
-                        "line-cap": "round",
-                        "line-join": "round"
-                    },
-                    "paint": {
-                        "line-color": "#D20C0C",
-                        "line-dasharray": [0.2, 2],
-                        "line-width": 2
-                    }
-                },
-                // polygon fill
-                {
-                    "id": "gl-draw-polygon-fill",
-                    "type": "fill",
-                    "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
-                    "paint": {
-                        "fill-color": "#D20C0C",
-                        "fill-outline-color": "#D20C0C",
-                        "fill-opacity": 0.1
-                    }
-                },
-                // polygon outline stroke
-                // This doesn't style the first edge of the polygon, which uses the line stroke styling instead
-                {
-                    "id": "gl-draw-polygon-stroke-active",
-                    "type": "line",
-                    "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
-                    "layout": {
-                        "line-cap": "round",
-                        "line-join": "round"
-                    },
-                    "paint": {
-                        "line-color": "#D20C0C",
-                        "line-dasharray": [0.2, 2],
-                        "line-width": 2
-                    }
-                },
-                // vertex point halos
-                {
-                    "id": "gl-draw-polygon-and-line-vertex-halo-active",
-                    "type": "circle",
-                    "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
-                    "paint": {
-                        "circle-radius": 5,
-                        "circle-color": "#FFF"
-                    }
-                },
-                // vertex points
-                {
-                    "id": "gl-draw-polygon-and-line-vertex-active",
-                    "type": "circle",
-                    "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
-                    "paint": {
-                        "circle-radius": 3,
-                        "circle-color": "#D20C0C",
-                    }
-                },
-
-                // INACTIVE (static, already drawn)
-                // line stroke
-                {
-                    "id": "gl-draw-line-static",
-                    "type": "line",
-                    "filter": ["all", ["==", "$type", "LineString"], ["==", "mode", "static"]],
-                    "layout": {
-                        "line-cap": "round",
-                        "line-join": "round"
-                    },
-                    "paint": {
-                        "line-color": "#000",
-                        "line-width": 3
-                    }
-                },
-                // polygon fill
-                {
-                    "id": "gl-draw-polygon-fill-static",
-                    "type": "fill",
-                    "filter": ["all", ["==", "$type", "Polygon"], ["==", "mode", "static"]],
-                    "paint": {
-                        "fill-color": "#000",
-                        "fill-outline-color": "#000",
-                        "fill-opacity": 0.1
-                    }
-                },
-                // polygon outline
-                {
-                    "id": "gl-draw-polygon-stroke-static",
-                    "type": "line",
-                    "filter": ["all", ["==", "$type", "Polygon"], ["==", "mode", "static"]],
-                    "layout": {
-                        "line-cap": "round",
-                        "line-join": "round"
-                    },
-                    "paint": {
-                        "line-color": "#000",
-                        "line-width": 3
-                    }
-                }
-            ]
+            styles: mapDrawStyles
         });
-
+        this.mapboxMap.addControl(new mapboxgl.NavigationControl({
+            showCompass: false,
+        }), 'bottom-right');
         this.mapboxMap.addControl(this.mapboxDraw, 'bottom-right');
         this.mapboxMap.addControl(new GeoJsonControl(this.mapboxDraw), 'bottom-right');
 

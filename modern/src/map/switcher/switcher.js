@@ -1,6 +1,7 @@
 import mapboxgl from 'mapbox-gl';
 import config from '../../config'
 import { addFireLayers, removeFireLayers } from '../FireLayers';
+
 export class SwitcherControl {
 
   constructor(styles, defaultStyle, beforeSwitch, afterSwitch) {
@@ -23,7 +24,7 @@ export class SwitcherControl {
     me.controlContainer.classList.add('mapboxgl-ctrl');
     me.controlContainer.classList.add('mapboxgl-ctrl-group');
     me.controlContainer.classList.add('mapboxgl-ctrl-top-right');
-    me.controlContainer.style.zIndex = 50000;
+    me.controlContainer.style.zIndex = 400;
 
     me.mapStyleContainer = document.createElement('div');
     me.mapStyleContainer.classList.add('mapboxgl-style-list');
@@ -39,15 +40,15 @@ export class SwitcherControl {
     });
 
     const addStyleItemButton = (style, indent) => {
-      const styleElement = document.createElement('button');
-      styleElement.type = 'button';
-      styleElement.innerText = style.title;
-      styleElement.classList.add(style.id);
-      if (indent) styleElement.classList.add('indent');
-      styleElement.dataset.uri = JSON.stringify(style.uri);
-      styleElement.dataset.id = style.id;
+      const container = document.createElement('button');
+      container.type = 'button';
+      container.innerText = style.title;
+      container.classList.add(style.id);
+      if (indent) container.classList.add('indent');
+      container.dataset.uri = JSON.stringify(style.uri);
+      container.dataset.id = style.id;
 
-      styleElement.addEventListener('click', event => {
+      container.addEventListener('click', event => {
         const styleId = event.target.dataset.id;
         if (!styleId) return; // If parent menu then just return;
 
@@ -79,7 +80,7 @@ export class SwitcherControl {
           document.getElementById('windy').style.visibility = 'hidden';
           document.getElementById('mapbox').style.visibility = 'visible';
 
-          mapboxgl.accessToken = config.MAPBOX_ACCESS_TOKEN;
+          mapboxgl.accessToken = config.MAPBOX_ACCESS_TOKEN;console.log('asdfasdfasdfasfd', JSON.parse(srcElement.dataset.uri))
           mapView.map.setStyle(JSON.parse(srcElement.dataset.uri));
 
           mapView.map.setCenter([previousCenter.lng, previousCenter.lat]);
@@ -104,22 +105,18 @@ export class SwitcherControl {
       });
 
       if (style.id === me.defaultStyle) {
-        styleElement.classList.add('active');
+        container.classList.add('active');
       }
-      me.mapStyleContainer.appendChild(styleElement);
+      me.mapStyleContainer.appendChild(container);
+
+      return container;
     }
 
-    const addStyleItemWithCheckboxes = (style, indent) => {
+    const addStyleItemWithCheckboxes = (style) => {
       const container = document.createElement('button');
-      container.classList.add(style.title.replace(/[^a-z0-9-]/gi, '_'));
-      if (indent) container.classList.add('indent');
-
-      const styleImg = document.createElement('img');
-      styleImg.src = style.img;
-      styleImg.style.width = '16px';
-      styleImg.style.verticalAlign = 'bottom';
-      styleImg.style.marginRight = '5px';
-      container.appendChild(styleImg);
+      container.type = 'button';
+      container.innerText = style.title;
+      container.classList.add(style.id);
 
       const titleSpan = document.createElement('span');
       titleSpan.innerText = style.title;
@@ -129,19 +126,18 @@ export class SwitcherControl {
       checkboxesSpan.style.float = 'right';
       checkboxesSpan.style.marginLeft = '5px';
 
-      for (const s of style.items) {
+      for (const c of style.checkboxes) {
         const checkboxSpan = document.createElement('span');
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-
-        checkbox.dataset.id = s.id;
-        checkbox.innerText = s.title;
+        checkbox.innerText = c.title;
+        checkbox.dataset.id = c.id;
         checkboxSpan.appendChild(checkbox);
 
         const label = document.createElement('label');
-        label.for = s.id;
-        label.innerText = s.title;
+        label.for = c.id;
+        label.innerText = c.title;
         checkboxSpan.appendChild(label);
 
         checkboxesSpan.appendChild(checkboxSpan);
@@ -151,19 +147,36 @@ export class SwitcherControl {
             me.mapStyleContainer.getElementsByClassName('mapFIRMS')[0].dispatchEvent(new Event('click'));
           }
 
-          const source = event.target.dataset.id;
+          const sources = (id) => {
+            let srcs = [];
+
+            switch (event.target.dataset.id) {
+              case 'mapFIRMS-24hrs':
+                srcs = ['mapModis-24hrs', 'mapVIIRS-S-NPP-24hrs', 'mapVIIRS-NOAA-20-24hrs'];
+                break;
+              case 'mapFIRMS-48hrs':
+                srcs = ['mapModis-48hrs', 'mapVIIRS-S-NPP-48hrs', 'mapVIIRS-NOAA-20-48hrs'];
+                break;
+              case 'mapFIRMS-7days':
+                srcs = ['mapModis-7days', 'mapVIIRS-S-NPP-7days', 'mapVIIRS-NOAA-20-7days'];
+                break;
+              default:
+            }
+
+            return srcs
+          }
 
           for (const checkbox of event.target.parentNode.parentNode.parentNode.getElementsByTagName('input')) {
             if (checkbox !== event.target) {
               checkbox.checked = false;
-              removeFireLayers(checkbox.dataset.id, map)
+              sources(checkbox.dataset.id).forEach(source => removeFireLayers(source, map));
             }
           }
 
           if (event.target.checked) {
-            addFireLayers(source, map, style.title);
+            sources(event.target.dataset.id).forEach(source => addFireLayers(source, map));
           } else {
-            removeFireLayers(source, map)
+            sources(event.target.dataset.id).forEach(source => removeFireLayers(source, map));
           }
         });
       }
@@ -173,15 +186,15 @@ export class SwitcherControl {
     }
 
     for (const style of me.styles) {
-      addStyleItemButton(style);
+      if (style.checkboxes) {
+        addStyleItemWithCheckboxes(style);
+      } else {
+        addStyleItemButton(style);
+      }
 
       if (style.items) {
         for (const s of style.items) {
-          if (s.checkboxes) {
-            addStyleItemWithCheckboxes(s, true);
-          } else {
-            addStyleItemButton(s, true);
-          }
+          addStyleItemButton(s, true);
         }
       }
     }
