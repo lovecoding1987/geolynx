@@ -51,7 +51,7 @@ const UserPage = () => {
                 variant="filled" />
             </AccordionDetails>
           </Accordion>
-          <Accordion>
+          {/* <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1">
                 {t('sharedAttributes')}
@@ -93,7 +93,7 @@ const UserPage = () => {
                   variant="filled" />
               </AccordionDetails>
             </Accordion>
-          }
+          } */}
         </>
       }
     </EditItemView>
