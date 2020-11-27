@@ -37,7 +37,7 @@ const SelectField = ({
             <MenuItem value={0}>&nbsp;</MenuItem>
           }
           {items.map(item => (
-            <MenuItem key={keyGetter(item)} value={keyGetter(item)}>{titleGetter(item)}</MenuItem>
+            <MenuItem key={keyGetter(item)} value={keyGetter(item)}>{item.prefixEl && item.prefixEl}{titleGetter(item)}</MenuItem>
           ))}
         </Select>
       </FormControl>

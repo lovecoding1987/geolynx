@@ -462,7 +462,7 @@
     "categoryTram": "Tram",
     "categoryTrolleybus": "Trolleybus",
     "categoryTruck": "Truck",
-    "categoryBomb": "Bomb",
+    "categoryBomb": "Firefighter",
     "categoryMoto": "Moto",
     "categoryVan": "Van",
     "category4x4": "4x4",
@@ -472,5 +472,10 @@
     "hrs": "hrs",
     "days": "days",
     "download_geojson": "Download GeoJson",
-    "upload_geojson": "Upload GeoJson"
+    "upload_geojson": "Upload GeoJson",
+    "color": "Color",
+    "blue": "Blue",
+    "green": "Green",
+    "orange": "Orange",
+    "grey": "Grey"
 }
