@@ -55,7 +55,7 @@ const DevicePage = () => {
               </Typography>
             </AccordionSummary>
             <AccordionDetails className={classes.details}>
-              <SelectField
+              {/* <SelectField
                 margin="normal"
                 defaultValue={item.groupId}
                 onChange={event => setItem({...item, groupId: Number(event.target.value)})}
@@ -79,7 +79,7 @@ const DevicePage = () => {
                 defaultValue={item.contact}
                 onChange={event => setItem({...item, contact: event.target.value})}
                 label={t('deviceContact')}
-                variant="filled" />
+                variant="filled" /> */}
               <SelectField
                 margin="normal"
                 defaultValue={item.category}
@@ -95,7 +95,7 @@ const DevicePage = () => {
                 label={t('sharedDisabled')} />
             </AccordionDetails>
           </Accordion>
-          <Accordion>
+          {/* <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1">
                 {t('sharedAttributes')}
@@ -138,7 +138,7 @@ const DevicePage = () => {
                   variant="filled" />
               </AccordionDetails>
             </Accordion>
-          }
+          } */}
         </>
       }
     </EditItemView>

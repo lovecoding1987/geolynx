@@ -1,5 +1,4 @@
 export const deviceCategories = [
-  '4x4',
   'bomb',
   'moto',
   'plane',

@@ -101,15 +101,15 @@ const MainToolbar = () => {
               </ListItemIcon>
               <ListItemText primary={t('mapTitle')} />
             </ListItem>
-            <ListItem button onClick={() => history.push('/replay')}>
+            {/* <ListItem button onClick={() => history.push('/replay')}>
               <ListItemIcon>
                 <ReplayIcon />
               </ListItemIcon>
               <ListItemText primary={t('reportReplay')} />
-            </ListItem>
+            </ListItem> */}
           </List>
           <Divider />
-          <List
+          {/* <List
             subheader={
               <ListSubheader>
                 {t('reportTitle')}
@@ -152,7 +152,7 @@ const MainToolbar = () => {
               <ListItemText primary={t('reportChart')} />
             </ListItem>
           </List>
-          <Divider />
+          <Divider /> */}
           <List
             subheader={
               <ListSubheader>
@@ -165,7 +165,7 @@ const MainToolbar = () => {
               </ListItemIcon>
               <ListItemText primary={t('settingsUser')} />
             </ListItem>
-            <ListItem button onClick={() => history.push('/settings/notifications')}>
+            {/* <ListItem button onClick={() => history.push('/settings/notifications')}>
               <ListItemIcon>
                 <NotificationsIcon />
               </ListItemIcon>
@@ -176,7 +176,7 @@ const MainToolbar = () => {
                 <FolderIcon />
               </ListItemIcon>
               <ListItemText primary={t('settingsGroups')} />
-            </ListItem>
+            </ListItem> */}
           </List>
           {adminEnabled && (
             <>

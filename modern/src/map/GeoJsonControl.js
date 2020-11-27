@@ -1,4 +1,5 @@
 import { downloadGeoJson } from './mapUtil';
+import t from '../common/localization';
 export default class GeoJsonControl {
     constructor(draw) {
         this.draw = draw;
@@ -14,7 +15,7 @@ export default class GeoJsonControl {
         this.downloadButton.type = 'button';
         this.downloadButton.classList.add('mapboxgl-ctrl-icon');
         this.downloadButton.innerHTML = '<i class="fa fa-download"></i>';
-        this.downloadButton.title = 'Download GeoJson';
+        this.downloadButton.title = t('download_geojson');
         this.downloadButton.addEventListener('click', () => {
             downloadGeoJson(this.draw.getAll(), 'geojson.json')
         });
@@ -25,7 +26,7 @@ export default class GeoJsonControl {
         this.uploadButton.type = 'button';
         this.uploadButton.classList.add('mapboxgl-ctrl-icon');
         this.uploadButton.innerHTML = '<i class="fa fa-upload"></i>';
-        this.uploadButton.title = 'Upload GeoJson';
+        this.uploadButton.title = t('upload_geojson');
         this.uploadButton.addEventListener('click', () => {
             document.getElementById('upload-geojson-file').click();
         });

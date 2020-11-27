@@ -118,10 +118,6 @@ export class SwitcherControl {
       container.innerText = style.title;
       container.classList.add(style.id);
 
-      const titleSpan = document.createElement('span');
-      titleSpan.innerText = style.title;
-      container.appendChild(titleSpan);
-
       const checkboxesSpan = document.createElement('span');
       checkboxesSpan.style.float = 'right';
       checkboxesSpan.style.marginLeft = '5px';
@@ -150,7 +146,7 @@ export class SwitcherControl {
           const sources = (id) => {
             let srcs = [];
 
-            switch (event.target.dataset.id) {
+            switch (id) {
               case 'mapFIRMS-24hrs':
                 srcs = ['mapModis-24hrs', 'mapVIIRS-S-NPP-24hrs', 'mapVIIRS-NOAA-20-24hrs'];
                 break;
@@ -190,12 +186,6 @@ export class SwitcherControl {
         addStyleItemWithCheckboxes(style);
       } else {
         addStyleItemButton(style);
-      }
-
-      if (style.items) {
-        for (const s of style.items) {
-          addStyleItemButton(s, true);
-        }
       }
     }
     me.controlContainer.appendChild(me.styleButton);

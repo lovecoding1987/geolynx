@@ -43,7 +43,9 @@ export default class MapView {
         this.mapboxMap = new mapboxgl.Map({
             container: this.mapboxContainer,
             style: styleOsm(),
-            animate: false
+            animate: false,
+            center: [-64.3121, -42.4128],
+            zoom: 4
         });
 
         this.mapboxMap.on('load', () => initMapboxMap(this.mapboxMap));
@@ -59,9 +61,9 @@ export default class MapView {
         });
         this.mapboxMap.addControl(new mapboxgl.NavigationControl({
             showCompass: false,
-        }), 'bottom-right');
-        this.mapboxMap.addControl(this.mapboxDraw, 'bottom-right');
-        this.mapboxMap.addControl(new GeoJsonControl(this.mapboxDraw), 'bottom-right');
+        }));
+        this.mapboxMap.addControl(this.mapboxDraw);
+        this.mapboxMap.addControl(new GeoJsonControl(this.mapboxDraw));
 
 
         this.windyContainer = document.createElement('div');

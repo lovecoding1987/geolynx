@@ -1,57 +1,65 @@
 import mapboxgl from 'mapbox-gl';
 import parse from 'csv-parse';
-import { loadMapImage } from './mapUtil';
 
 export const addFireLayers = async (source, map) => {
     if (map.getSource(source)) {
         map.setLayoutProperty(source, 'visibility', 'visible'); return;
     };
 
-    let url, icon, title;
+    let url, color, stroke_color, title;
     switch (source) {
         case 'mapModis-24hrs':
             url = '/data/active_fire/c6/csv/MODIS_C6_South_America_24h.csv'; 
-            icon = 'fire_modis';
+            color = '#fffc61';
+            stroke_color = '#f52e2e';
             title = 'MODIS';
             break;
         case 'mapModis-48hrs':
             url = '/data/active_fire/c6/csv/MODIS_C6_South_America_48h.csv'; 
-            icon = 'fire_modis';
+            color = '#ff8361';
+            stroke_color = '#f5af2e';
             title = 'MODIS';
             break;
         case 'mapModis-7days':
             url = '/data/active_fire/c6/csv/MODIS_C6_South_America_7d.csv'; 
-            icon = 'fire_modis';
+            color = '#d7ff61';
+            stroke_color = '#f5c72e';
             title = 'MODIS';
             break;
         case 'mapVIIRS-S-NPP-24hrs':
             url = '/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_America_24h.csv'; 
-            icon = 'fire_viirs_snpp';
+            color = '#fffc61';
+            stroke_color = '#f52e2e';
             title = 'VIIRS Suomi NPP';
             break;
         case 'mapVIIRS-S-NPP-48hrs':
             url = '/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_America_48h.csv';
-            icon = 'fire_viirs_snpp';
+            color = '#ff8361';
+            stroke_color = '#f5af2e';
             title = 'VIIRS Suomi NPP';
             break;
         case 'mapVIIRS-S-NPP-7days':
             url = '/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_America_7d.csv'; 
-            icon = 'fire_viirs_snpp';
+            color = '#d7ff61';
+            stroke_color = '#f5c72e';
             title = 'VIIRS Suomi NPP';
             break;
         case 'mapVIIRS-NOAA-20-24hrs':
             url = '/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_South_America_24h.csv'; 
-            icon = 'fire_viirs_noaa';
+            color = '#fffc61';
+            stroke_color = '#f52e2e';
             title = 'VIIRS NOAA-20';
             break;
         case 'mapVIIRS-NOAA-20-48hrs':
             url = '/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_South_America_48h.csv'; 
-            icon = 'fire_viirs_noaa';
+            color = '#ff8361';
+            stroke_color = '#f5af2e';
             title = 'VIIRS NOAA-20';
             break;
         case 'mapVIIRS-NOAA-20-7days':
             url = '/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_South_America_7d.csv'; 
-            icon = 'fire_viirs_noaa';
+            color = '#d7ff61';
+            stroke_color = '#f5c72e';
             title = 'VIIRS NOAA-20';
             break;
         default:
@@ -65,8 +73,6 @@ export const addFireLayers = async (source, map) => {
     }, async function (err, records) {
         if (err) return;
         
-        if (!map.hasImage(icon)) map.addImage(icon, await loadMapImage(map, `images/${icon}.png`));
-    
         const features = records.map(record => ({
             type: 'Feature',
             geometry: {
@@ -88,20 +94,17 @@ export const addFireLayers = async (source, map) => {
 
         map.addLayer({
             'id': source,
-            'type': 'symbol',
+            'type': 'circle',
             'source': source,
-            'layout': {
-                'icon-image': icon,
-                // get the title name from the source's "title" property
-                'text-field': ['get', 'title'],
-                'text-font': [
-                    'Open Sans Semibold',
-                    'Arial Unicode MS Bold'
-                ],
-                'text-offset': [0, 1.25],
-                'text-anchor': 'top',
-                'icon-allow-overlap': true
-            }
+            'paint': {
+                'circle-radius': 10,
+                'circle-color': color,
+                'circle-blur': 0.4,
+                'circle-opacity': 0.7,
+                'circle-stroke-color': stroke_color,
+                'circle-stroke-width': 3,
+                'circle-stroke-opacity': 1
+              }
         });
 
 
@@ -137,7 +140,7 @@ export const addFireLayers = async (source, map) => {
     })
 }
 
-export const removeFireLayers = async (source, map) => {
+export const removeFireLayers = (source, map) => {
     if (map.getLayer(source)) {
         map.setLayoutProperty(
             source,

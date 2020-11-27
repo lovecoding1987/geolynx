@@ -45,3 +45,7 @@
   background-repeat: no-repeat;
   background-size: 70%;
 }
+
+.mapboxgl-control-container .mapboxgl-ctrl-top-right {
+  margin-top: 40px;
+}

@@ -462,8 +462,14 @@
     "categoryTram": "Tram",
     "categoryTrolleybus": "Trolleybus",
     "categoryTruck": "Truck",
+    "categoryBomb": "Bomb",
+    "categoryMoto": "Moto",
     "categoryVan": "Van",
     "categoryScooter": "Scooter",
     "maintenanceStart": "Start",
-    "maintenancePeriod": "Period"
+    "maintenancePeriod": "Period",
+    "hrs": "hrs",
+    "days": "days",
+    "download_geojson": "Download GeoJson",
+    "upload_geojson": "Upload GeoJson"
 }

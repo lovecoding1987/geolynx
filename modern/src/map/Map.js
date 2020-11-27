@@ -30,30 +30,20 @@ const updateReadyValue = value => {
 mapView.addControl(new SwitcherControl(
   [
     { id: 'mapOsm', title: t('mapOsm'), uri: styleOsm() },
-    {
-      title: t('mapbox'),
-      items: [
-        { id: 'mapMapboxGround', title: t('ground'), uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
-        { id: 'mapMapboxVegetation', title: t('vegetation'), uri: styleMapbox('ckgh3eou302i219pbebto8f0c') },
-        { id: 'mapMapboxApplications', title: t('applications'), uri: styleMapbox('ckhhgcqyq08or19mixazio9js') },
-        { id: 'mapMapboxDemo', title: t('demo'), uri: styleMapbox('ckhl25qo906em19mcaj1x2evp') }
-      ]
-    },
-    {
-      title: t('weather'),
-      items: [
-        { id: 'mapWinds', title: t('winds'), uri: ''},
-        { id: 'mapTemperatures', title: t('temperatures'), uri: ''},
-      ]
-    }, 
+    { id: 'mapMapboxGround', title: t('ground'), uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
+    { id: 'mapMapboxVegetation', title: t('vegetation'), uri: styleMapbox('ckgh3eou302i219pbebto8f0c') },
+    { id: 'mapMapboxApplications', title: t('applications'), uri: styleMapbox('ckhhgcqyq08or19mixazio9js') },
+    { id: 'mapMapboxDemo', title: t('demo'), uri: styleMapbox('ckhl25qo906em19mcaj1x2evp') },
+    { id: 'mapWinds', title: t('winds'), uri: ''},
+    { id: 'mapTemperatures', title: t('temperatures'), uri: ''},
     {
       id: 'mapFIRMS',
       title: t('hot_spots'),
       uri: styleMapbox('ckhvoc3ym0grz19k72icogk47'),
       checkboxes:[
-        {id: 'mapFIRMS-24hrs', title: '24 hrs'},
-        {id: 'mapFIRMS-48hrs', title: '48 hrs'},
-        {id: 'mapFIRMS-7days', title: '7 days'},
+        {id: 'mapFIRMS-24hrs', title: `24 ${t('hrs')}`},
+        {id: 'mapFIRMS-48hrs', title: `48 ${t('hrs')}`},
+        {id: 'mapFIRMS-7days', title: `7 ${t('days')}`},
       ]
     }    
   ],
