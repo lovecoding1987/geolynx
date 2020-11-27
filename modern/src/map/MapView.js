@@ -45,7 +45,7 @@ export default class MapView {
             style: styleOsm(),
             animate: false,
             center: [-64.3121, -42.4128],
-            zoom: 4
+            zoom: 3
         });
 
         this.mapboxMap.on('load', () => initMapboxMap(this.mapboxMap));
@@ -109,7 +109,9 @@ export default class MapView {
     }
 
     resize() {
-        this.map.resize();
+        if (this.map instanceof mapboxgl.Map) {
+            this.map.resize();
+        }
     }
 
     hasImage(name) {

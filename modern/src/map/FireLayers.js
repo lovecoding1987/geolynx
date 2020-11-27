@@ -73,16 +73,19 @@ export const addFireLayers = async (source, map) => {
     }, async function (err, records) {
         if (err) return;
         
-        const features = records.map(record => ({
-            type: 'Feature',
-            geometry: {
-                type: 'Point',
-                coordinates: [record.longitude, record.latitude]
-            },
-            properties: {
-                description: `<strong>${title}</strong><br/>Date: ${record.acq_date}, Time: ${record.acq_time.substring(0, 2)}:${record.acq_time.substring(2)}`
+        const features = records.map(record => {
+            const date = new Date(record.acq_date);
+            return {
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [record.longitude, record.latitude]
+                },
+                properties: {
+                    description: `<strong>${title}</strong><br/>Date: ${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}, Time: ${record.acq_time.substring(0, 2)}:${record.acq_time.substring(2)}`
+                }
             }
-        }));
+        });
 
         map.addSource(source, {
             'type': 'geojson',
