@@ -26,6 +26,9 @@ const updateReadyValue = value => {
   readyListeners.forEach(listener => listener(value));
 };
 
+mapView.onLoadedMapboxMap = () => {
+  updateReadyValue(true);
+}
 
 mapView.addControl(new SwitcherControl(
   [

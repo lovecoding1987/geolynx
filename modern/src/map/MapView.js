@@ -9,8 +9,7 @@ import GeoJsonControl from './GeoJsonControl';
 
 
 
-export const initMapboxMap = async (map) => {
-
+export const initMapboxMap = async (map, onLoaded) => {
     await Promise.all(deviceCategories.map(async category => {
         if (!map.hasImage(`${category}_blue`)) map.addImage(`${category}_blue`, await loadMapImage(map, `images/icon/${category}_blue.png`), { pixelRatio: window.devicePixelRatio });
         if (!map.hasImage(`${category}_green`)) map.addImage(`${category}_green`, await loadMapImage(map, `images/icon/${category}_green.png`), { pixelRatio: window.devicePixelRatio });
@@ -23,6 +22,8 @@ export const initMapboxMap = async (map) => {
     }));
 
     if (!map.hasImage('marker-default')) map.addImage('marker-default', await loadMapImage(map, 'images/marker.png'));
+
+    if (onLoaded) onLoaded();
 };
 
 export default class MapView {
@@ -48,7 +49,7 @@ export default class MapView {
             zoom: 3
         });
 
-        this.mapboxMap.on('load', () => initMapboxMap(this.mapboxMap));
+        this.mapboxMap.on('load', () => initMapboxMap(this.mapboxMap, this.onLoadedMapboxMap));
 
 
         this.mapboxDraw = new MapboxDraw({
