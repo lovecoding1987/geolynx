@@ -114,16 +114,12 @@ const LoginPage = () => {
 
           <FormControl fullWidth margin='normal'>
             <div className={classes.buttons}>
-              <Button type='submit' variant='contained' color='primary' disabled={!email || !password}>
-                {t('loginLogin')}
-              </Button>
-            </div>
-          </FormControl>
-          <FormControl fullWidth margin='normal'>
-            <div className={classes.buttons}>
               <Typography>
                 <Link href="#" onClick={gotoRegister}>{t('loginRegister')}</Link>
               </Typography>
+              <Button type='submit' variant='contained' color='primary' disabled={!email || !password}>
+                {t('loginLogin')}
+              </Button>
             </div>
           </FormControl>
         </form>

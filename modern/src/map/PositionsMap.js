@@ -15,7 +15,7 @@ const PositionsMap = ({ positions }) => {
   const devices = useSelector(state => state.devices.items);
 
   const createFeature = (devices, position) => {
-    const device = devices[position.deviceId] || null;
+    const device = devices[position.deviceId] || null;console.log('>>>>>>>>>>>>>> map image', device.category, map.hasImage(device.category));
     return {
       deviceId: position.deviceId,
       name: device ? device.name : '',
@@ -97,7 +97,15 @@ const PositionsMap = ({ positions }) => {
     };
   }, [onClickCallback]);
 
-  useEffect(() => {
+  useEffect(() => {console.log('+===================positions map setting data', map.getSource(id), positions.map(position => ({
+    type: 'Feature',
+    geometry: {
+      type: 'Point',
+      coordinates: [position.longitude, position.latitude],
+    },
+    properties: createFeature(devices, position),
+  })));
+  
     map.getSource(id).setData({
       type: 'FeatureCollection',
       features: positions.map(position => ({
