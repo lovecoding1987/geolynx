@@ -97,15 +97,7 @@ const PositionsMap = ({ positions }) => {
     };
   }, [onClickCallback]);
 
-  useEffect(() => {
-    type: 'Feature',
-    geometry: {
-      type: 'Point',
-      coordinates: [position.longitude, position.latitude],
-    },
-    properties: createFeature(devices, position),
-  })));
-  
+  useEffect(() => {  
     map.getSource(id).setData({
       type: 'FeatureCollection',
       features: positions.map(position => ({
