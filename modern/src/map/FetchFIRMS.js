@@ -7,7 +7,6 @@ export const fetchFIRMS = async (url, mapView) => {
         from_line: 1
     }, function (err, records) {
         if (err) return;
-        console.log(records)
 
         const features = records.map(record => ({
             type: 'Feature',

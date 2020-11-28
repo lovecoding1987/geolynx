@@ -80,7 +80,7 @@ export class SwitcherControl {
           document.getElementById('windy').style.visibility = 'hidden';
           document.getElementById('mapbox').style.visibility = 'visible';
 
-          mapboxgl.accessToken = config.MAPBOX_ACCESS_TOKEN;console.log('asdfasdfasdfasfd', JSON.parse(srcElement.dataset.uri))
+          mapboxgl.accessToken = config.MAPBOX_ACCESS_TOKEN;
           mapView.map.setStyle(JSON.parse(srcElement.dataset.uri));
 
           mapView.map.setCenter([previousCenter.lng, previousCenter.lat]);

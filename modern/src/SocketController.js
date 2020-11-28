@@ -34,7 +34,7 @@ const SocketController = () => {
       setTimeout(() => connectSocket(), 60 * 1000);
     };
 
-    socket.onmessage = (event) => {console.log('>>>>>>>>>>>>>> socket message', event);
+    socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.devices) {
         dispatch(devicesActions.update(data.devices));
