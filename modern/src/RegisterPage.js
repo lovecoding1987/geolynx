@@ -94,7 +94,6 @@ const RegisterPage = () => {
     <main className={classes.root}>
       <Paper className={classes.paper}>
         <img className={classes.logo} src='/logo.png' alt='Geolynx' />
-        <Typography variant="h5" gutterBottom style={{marginBottom:0}}>Register</Typography>
         <form onSubmit={handleRegister}>
           <TextField
             margin='normal'
