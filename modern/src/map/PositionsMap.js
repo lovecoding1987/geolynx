@@ -111,7 +111,7 @@ const PositionsMap = ({ positions }) => {
     });
   }, [devices, positions]);
 
-  return null;
+return null;
 }
 
 export default PositionsMap;

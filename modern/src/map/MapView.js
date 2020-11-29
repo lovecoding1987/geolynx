@@ -138,6 +138,8 @@ export default class MapView {
             this.map = this.mapboxMap;
             this.mapProvider = 'mapbox';
         }
+
+        this.mapStyleId = styleId;
     }
 
     getZoom() {

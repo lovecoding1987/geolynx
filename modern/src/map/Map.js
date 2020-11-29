@@ -1,5 +1,6 @@
 import MapView, {initMapboxMap} from './MapView';
 import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
+
 import { SwitcherControl } from './switcher/switcher';
 import './switcher/switcher.css';
 import { styleMapbox, styleOsm } from './mapStyles';
@@ -53,7 +54,7 @@ mapView.addControl(new SwitcherControl(
   'mapOsm',
   (styleId) => {
     mapView.setMapByStyle(styleId);
-    updateReadyValue(false)
+    updateReadyValue(false);
   },
   () => {
     setTimeout(() => {
@@ -61,7 +62,7 @@ mapView.addControl(new SwitcherControl(
         if (!mapView.loaded()) {
           setTimeout(waiting, 100);
         } else {
-          initMapboxMap(map);
+          initMapboxMap(map, () => {updateReadyValue(true)});
         }
       };
       waiting();
@@ -69,13 +70,11 @@ mapView.addControl(new SwitcherControl(
   },
 ));
 
-const Map = ({ children }) => {
+const Map = ({ children, mapStyle }) => { 
   const containerEl = useRef(null);
 
   const [mapReady, setMapReady] = useState(false);
   const [popoverData, setPopoverData] = useState(null);
-
-  
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -90,7 +89,7 @@ const Map = ({ children }) => {
   useEffect(() => {   
     const onSetWindyMap = (e) => {
       mapView.setWindyMap(e.detail.map);
-      mapView.setWindyStore(e.detail.store)
+      mapView.setWindyStore(e.detail.store);
     }
     document.addEventListener('setWindyMap', onSetWindyMap, false);
 
@@ -133,7 +132,7 @@ const Map = ({ children }) => {
     mapView.mapboxDraw.setFeatureProperty(featureId, 'icon', icon);
   }
 
-  const popoverOpen = popoverData !== null;
+  const popoverOpen = popoverData !== null; 
   return (
     <div style={{ width: '100%', height: '100%' }} ref={containerEl}>
       {mapReady && children}

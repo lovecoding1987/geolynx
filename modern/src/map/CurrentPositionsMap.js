@@ -5,6 +5,7 @@ import PositionsMap from './PositionsMap';
 
 const CurrentPositionsMap = () => {
   const positions = useSelector(state => Object.values(state.positions.items));
+  
   return (<PositionsMap positions={positions} />);
 }
 

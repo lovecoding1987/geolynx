@@ -69,6 +69,7 @@ const MainPage = ({ width }) => {
       paddingLeft: 10,
       opacity: 0.6
   }
+  
   return (
     <div className={classes.root}>
       <MainToolbar />
@@ -86,7 +87,7 @@ const MainPage = ({ width }) => {
         <div className={classes.mapContainer}>
           <ContainerDimensions>
             <Map>
-              <CurrentLocationMap />
+              <CurrentLocationMap/>
               <GeofenceMap />
               <AccuracyMap />
               <CurrentPositionsMap />
