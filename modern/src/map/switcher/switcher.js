@@ -27,6 +27,7 @@ export class SwitcherControl {
     me.controlContainer.style.zIndex = 400;
 
     me.mapStyleContainer = document.createElement('div');
+    me.mapStyleContainer.id = 'map-style-container';
     me.mapStyleContainer.classList.add('mapboxgl-style-list');
     me.controlContainer.appendChild(me.mapStyleContainer);
 
@@ -87,8 +88,8 @@ export class SwitcherControl {
           mapView.map.setZoom(previousZoom);
         }
         me.afterSwitch();
-        //me.mapStyleContainer.style.display = 'none';
-        //me.styleButton.style.display = 'block';
+        me.mapStyleContainer.style.display = 'none';
+        me.styleButton.style.display = 'block';
 
         const elms = me.mapStyleContainer.getElementsByClassName('active');
         while (elms[0]) {
@@ -126,6 +127,7 @@ export class SwitcherControl {
         const checkboxSpan = document.createElement('span');
 
         const checkbox = document.createElement('input');
+        checkbox.classList.add(c.id);
         checkbox.type = 'checkbox';
         checkbox.innerText = c.title;
         checkbox.dataset.id = c.id;
@@ -170,10 +172,12 @@ export class SwitcherControl {
           }
 
           if (event.target.checked) {
-            sources(event.target.dataset.id).forEach(source => addFireLayers(source, map));
+            sources(event.target.dataset.id).forEach(source => addFireLayers(source, map, event.target.dataset.id));
           } else {
             sources(event.target.dataset.id).forEach(source => removeFireLayers(source, map));
           }
+          me.mapStyleContainer.style.display = 'none';
+          me.styleButton.style.display = 'block';
         });
       }
       container.appendChild(checkboxesSpan);

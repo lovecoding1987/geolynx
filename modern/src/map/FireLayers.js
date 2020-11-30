@@ -1,7 +1,7 @@
 import mapboxgl from 'mapbox-gl';
 import parse from 'csv-parse';
 
-export const addFireLayers = async (source, map) => {
+export const addFireLayers = async (source, map, firmsKind) => {
     if (map.getSource(source)) {
         map.setLayoutProperty(source, 'visibility', 'visible'); return;
     };
@@ -140,6 +140,17 @@ export const addFireLayers = async (source, map) => {
             map.getCanvas().style.cursor = '';
             popup.remove();
         });
+
+
+        for(const checkbox of document.getElementById('map-style-container').getElementsByTagName('input')) {
+            if (checkbox.dataset.id === firmsKind)     {
+                map.setLayoutProperty(
+                    source,
+                    'visibility',
+                    checkbox.checked ? 'visible' : 'none'
+                )                
+            }
+        }
     })
 }
 

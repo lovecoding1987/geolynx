@@ -3,7 +3,6 @@ import { isWidthUp, makeStyles, withWidth } from '@material-ui/core';
 import Drawer from '@material-ui/core/Drawer';
 import Fab from '@material-ui/core/Fab';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
-import 'mapbox-gl/dist/mapbox-gl.css';
 
 import ContainerDimensions from 'react-container-dimensions';
 import DevicesList from './DevicesList';
@@ -11,9 +10,7 @@ import MainToolbar from './MainToolbar';
 import Map from './map/Map';
 import SelectedDeviceMap from './map/SelectedDeviceMap';
 import AccuracyMap from './map/AccuracyMap';
-import GeofenceMap from './map/GeofenceMap';
 import CurrentPositionsMap from './map/CurrentPositionsMap';
-import CurrentLocationMap from './map/CurrentLocationMap';
 
 const useStyles = makeStyles(theme => ({
   root: {
