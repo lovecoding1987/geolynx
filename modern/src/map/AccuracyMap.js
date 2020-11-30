@@ -15,7 +15,7 @@ const AccuracyMap = () => {
   }));
 
   useEffect(() => {
-    try {
+    if (!map.getSource(id)) {
       map.addSource(id, {
         'type': 'geojson',
         'data': {
@@ -23,26 +23,28 @@ const AccuracyMap = () => {
           features: []
         }
       });
-    } catch(e) {}
+    } 
 
-    map.addLayer({
-      'source': id,
-      'id': id,
-      'type': 'fill',
-      'filter': [
-         'all',
-         ['==', '$type', 'Polygon'],
-      ],
-      'paint': {
-         'fill-color':'#3bb2d0',
-         'fill-outline-color':'#3bb2d0',
-         'fill-opacity':0.25,
-      },
-    });
+    if (!map.getLayer(id)) {
+      map.addLayer({
+        'source': id,
+        'id': id,
+        'type': 'fill',
+        'filter': [
+           'all',
+           ['==', '$type', 'Polygon'],
+        ],
+        'paint': {
+           'fill-color':'#3bb2d0',
+           'fill-outline-color':'#3bb2d0',
+           'fill-opacity':0.25,
+        },
+      });
+    }
 
     return () => {
-      map.removeLayer(id);
-      try {map.removeSource(id);} catch(e) {}
+      if (map.getLayer(id)) map.removeLayer(id);
+      if (map.getSource(id)) map.removeSource(id);
     };
   }, []);
 

@@ -1,4 +1,3 @@
-import MapView, {initMapboxMap} from './MapView';
 import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
 
 import { SwitcherControl } from './switcher/switcher';
@@ -6,6 +5,7 @@ import './switcher/switcher.css';
 import { styleMapbox, styleOsm } from './mapStyles';
 import t from '../common/localization';
 import DrawPopover from '../DrawPopover';
+import MapView, {initMapboxMap} from './MapView';
 
 const mapView = new MapView();
 export const map = mapView.mapboxMap;

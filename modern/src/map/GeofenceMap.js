@@ -18,7 +18,7 @@ const GeofenceMap = () => {
   }, []);
 
   useEffect(() => {
-    try {
+    if (!map.getSource(id)) {
       map.addSource(id, {
         'type': 'geojson',
         'data': {
@@ -26,63 +26,72 @@ const GeofenceMap = () => {
           features: []
         }
       });
-    } catch(e) {}
+    }
 
-    map.addLayer({
-      'source': id,
-      'id': 'geofences-fill',
-      'type': 'fill',
-      'filter': [
-         'all',
-         ['==', '$type', 'Polygon'],
-      ],
-      'paint': {
-         'fill-color':'#3bb2d0',
-         'fill-outline-color':'#3bb2d0',
-         'fill-opacity':0.1,
-      },
-    });
-    map.addLayer({
-      'source': id,
-      'id': 'geofences-line',
-      'type': 'line',
-      'paint': {
-         'line-color': '#3bb2d0',
-         'line-width': 2,
-      },
-    });
-    map.addLayer({
-      'source': id,
-      'id': 'geofences-title',
-      'type': 'symbol',
-      'layout': {
-        'text-field': '{name}',
-        'text-font': ['Roboto Regular'],
-        'text-size': 12,
-      },
-      'paint': {
-        'text-halo-color': 'white',
-        'text-halo-width': 1,
-      },
-    });
+    if (!map.getLayer('geofences-fill')) {
+      map.addLayer({
+        'source': id,
+        'id': 'geofences-fill',
+        'type': 'fill',
+        'filter': [
+          'all',
+          ['==', '$type', 'Polygon'],
+        ],
+        'paint': {
+          'fill-color': '#3bb2d0',
+          'fill-outline-color': '#3bb2d0',
+          'fill-opacity': 0.1,
+        },
+      });
+    }
+    if (!map.getLayer('geofences-line')) {
+      map.addLayer({
+        'source': id,
+        'id': 'geofences-line',
+        'type': 'line',
+        'paint': {
+          'line-color': '#3bb2d0',
+          'line-width': 2,
+        },
+      });
+    }
+
+    if (!map.getLayer('geofences-title')) {
+      map.addLayer({
+        'source': id,
+        'id': 'geofences-title',
+        'type': 'symbol',
+        'layout': {
+          'text-field': '{name}',
+          'text-font': ['Roboto Regular'],
+          'text-size': 12,
+        },
+        'paint': {
+          'text-halo-color': 'white',
+          'text-halo-width': 1,
+        },
+      });
+    }
 
     return () => {
-      map.removeLayer('geofences-fill');
-      map.removeLayer('geofences-line');
-      map.removeLayer('geofences-title');
-      try {map.removeSource(id);} catch(e) {}
+      if (map.getLayer('geofences-fill')) map.removeLayer('geofences-fill');
+      if (map.getLayer('geofences-line')) map.removeLayer('geofences-line');
+      if (map.getLayer('geofences-title')) map.removeLayer('geofences-title');
+      if (map.getSource(id)) map.removeSource(id);
     };
   }, []);
 
   useEffect(() => {
-    map.getSource(id).setData({
-      type: 'FeatureCollection',
-      features: geofences.map(item => [item.name, reverseCoordinates(wellknown(item.area))]).filter(([, geometry]) => !!geometry).map(([name, geometry]) => ({
-        type: 'Feature',
-        geometry: geometry,
-        properties: { name },
-      })),
-    });
+    if (map.getSource(id)) {
+      map.getSource(id).setData({
+        type: 'FeatureCollection',
+        features: geofences.map(item => [item.name, reverseCoordinates(wellknown(item.area))]).filter(([, geometry]) => !!geometry).map(([name, geometry]) => ({
+          type: 'Feature',
+          geometry: geometry,
+          properties: { name },
+        })),
+      });
+    }
   }, [geofences]);
 
   return null;

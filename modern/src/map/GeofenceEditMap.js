@@ -14,7 +14,7 @@ const draw = new MapboxDraw({
 
 const GeofenceEditMap = () => {
   useEffect(() => {
-    map.addControl(draw, 'top-left');
+    map.addControl(draw, 'bottom-left');
     return () => map.removeControl(draw);
   }, []);
 

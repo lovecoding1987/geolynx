@@ -6,7 +6,7 @@ const ReplayPathMap = ({ positions }) => {
   const id = 'replay';
 
   useEffect(() => {
-    try {
+    if (!map.getSource(id)) {
       map.addSource(id, {
         'type': 'geojson',
         'data': {
@@ -17,25 +17,27 @@ const ReplayPathMap = ({ positions }) => {
           },
         },
       });
-    } catch(e) {}
+    }
 
-    map.addLayer({
-      'source': id,
-      'id': id,
-      'type': 'line',
-      'layout': {
-        'line-join': 'round',
-        'line-cap': 'round',
-      },
-      'paint': {
-         'line-color': '#333',
-         'line-width': 5,
-      },
-    });
+    if (!map.getLayer(id)) {
+      map.addLayer({
+        'source': id,
+        'id': id,
+        'type': 'line',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        'paint': {
+          'line-color': '#333',
+          'line-width': 5,
+        },
+      });
+    }
 
     return () => {
-      map.removeLayer(id);
-      try {map.removeSource(id);} catch(e) {}
+      if (map.getLayer(id)) map.removeLayer(id);
+      if (map.getSource(id)) map.removeSource(id);
     };
   }, []);
 

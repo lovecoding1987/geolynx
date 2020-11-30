@@ -1,6 +1,6 @@
 const options = {
     key: '2677t825ITJyjNOy759Q0ZwJLJvrBmT9',
-    verbose: true,
+    verbose: false,
 
     // Optional: Initial state of the map
     lat: 0,

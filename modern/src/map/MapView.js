@@ -1,4 +1,3 @@
-import 'mapbox-gl/dist/mapbox-gl.css';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import mapboxgl from 'mapbox-gl';
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
@@ -18,7 +17,7 @@ export const initMapboxMap = async (map, onLoaded) => {
     }));
 
     await Promise.all(markerIcons.map(async icon => {
-        if (!map.hasImage(`marker-${icon}`)) map.addImage(`marker-${icon}`, await loadMapImage(map, `images/marker_${icon}.png`));        
+        if (!map.hasImage(`marker-${icon}`)) map.addImage(`marker-${icon}`, await loadMapImage(map, `images/marker_${icon}.png`));
     }));
 
     if (!map.hasImage('marker-default')) map.addImage('marker-default', await loadMapImage(map, 'images/marker.png'));
@@ -62,6 +61,13 @@ export default class MapView {
         });
         this.mapboxMap.addControl(new mapboxgl.NavigationControl({
             showCompass: false,
+        }));
+        this.mapboxMap.addControl(new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true,
+                timeout: 5000,
+            },
+            trackUserLocation: true,
         }));
         this.mapboxMap.addControl(this.mapboxDraw);
         this.mapboxMap.addControl(new GeoJsonControl(this.mapboxDraw));

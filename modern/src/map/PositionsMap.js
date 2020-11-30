@@ -51,7 +51,7 @@ const PositionsMap = ({ positions }) => {
   }, [history]);
 
   useEffect(() => {
-    try {
+    if (!map.getSource(id)) {
       map.addSource(id, {
         'type': 'geojson',
         'data': {
@@ -59,27 +59,29 @@ const PositionsMap = ({ positions }) => {
           features: [],
         }
       });
-    } catch(e) {}
+    }
 
-    map.addLayer({
-      'id': id,
-      'type': 'symbol',
-      'source': id,
-      'layout': {
-        'icon-image': '{category}',
-        'icon-allow-overlap': true,
-        'text-field': '{name}',
-        'text-allow-overlap': true,
-        'text-anchor': 'bottom',
-        'text-offset': [0, -2],
-        'text-font': ['Roboto Regular'],
-        'text-size': 12,
-      },
-      'paint': {
-        'text-halo-color': 'white',
-        'text-halo-width': 1,
-      },
-    });
+    if (!map.getLayer(id)) {
+      map.addLayer({
+        'id': id,
+        'type': 'symbol',
+        'source': id,
+        'layout': {
+          'icon-image': '{category}',
+          'icon-allow-overlap': true,
+          'text-field': '{name}',
+          'text-allow-overlap': true,
+          'text-anchor': 'bottom',
+          'text-offset': [0, -2],
+          'text-font': ['Roboto Regular'],
+          'text-size': 12,
+        },
+        'paint': {
+          'text-halo-color': 'white',
+          'text-halo-width': 1,
+        },
+      });
+    }
 
     map.on('mouseenter', id, onMouseEnter);
     map.on('mouseleave', id, onMouseLeave);
@@ -92,12 +94,12 @@ const PositionsMap = ({ positions }) => {
       map.off('mouseleave', id, onMouseLeave);
       map.off('click', id, onClickCallback);
 
-      map.removeLayer(id);
-      try {map.removeSource(id);} catch(e) {}
+      if (map.getLayer(id)) map.removeLayer(id);
+      if (map.getSource(id)) map.removeSource(id);
     };
   }, [onClickCallback]);
 
-  useEffect(() => {  
+  useEffect(() => {
     map.getSource(id).setData({
       type: 'FeatureCollection',
       features: positions.map(position => ({
@@ -111,7 +113,7 @@ const PositionsMap = ({ positions }) => {
     });
   }, [devices, positions]);
 
-return null;
+  return null;
 }
 
 export default PositionsMap;

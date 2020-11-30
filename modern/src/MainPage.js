@@ -3,6 +3,7 @@ import { isWidthUp, makeStyles, withWidth } from '@material-ui/core';
 import Drawer from '@material-ui/core/Drawer';
 import Fab from '@material-ui/core/Fab';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 import ContainerDimensions from 'react-container-dimensions';
 import DevicesList from './DevicesList';
@@ -87,8 +88,6 @@ const MainPage = ({ width }) => {
         <div className={classes.mapContainer}>
           <ContainerDimensions>
             <Map>
-              <CurrentLocationMap/>
-              <GeofenceMap />
               <AccuracyMap />
               <CurrentPositionsMap />
               <SelectedDeviceMap />
