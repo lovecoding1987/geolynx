@@ -1,0 +1,13 @@
+2020-11-29 09:16:22  INFO: user: 1, action: login
+2020-11-29 13:11:37  INFO: user: 2, action: login
+2020-11-29 13:16:08  INFO: user: 2, action: logout
+2020-11-29 13:21:18  INFO: user: 2, action: login
+2020-11-29 13:22:10  INFO: user: 2, action: login
+2020-11-29 19:04:16  INFO: user: 1, action: logout
+2020-11-29 19:04:44  INFO: login failed from: 181.10.31.82
+2020-11-29 19:04:48  INFO: user: 2, action: login
+2020-11-29 19:15:16  INFO: user: 2, action: login
+2020-11-29 20:16:43  INFO: user: 2, action: logout
+2020-11-29 20:16:56  WARN: /api/socket - NullPointerException (AsyncSocketServlet:37 < ...)
+2020-11-29 20:16:59  INFO: user: 2, action: login
+2020-11-29 20:17:26  INFO: user: 2, action: edit, object: device, id: 33

@@ -1,0 +1,7 @@
+2020-11-05 23:44:36  INFO: login failed from: 181.10.31.82
+2020-11-05 23:46:46  INFO: user: 0, action: create, object: user, id: 2
+2020-11-05 23:46:54  INFO: user: 2, action: login
+2020-11-05 23:48:41  INFO: user: 2, action: create, object: driver, id: 1
+2020-11-05 23:48:41  INFO: user: 2, action: link, owner: user, id: 2, property: driver, id: 1
+2020-11-05 23:49:48  INFO: user: 2, action: create, object: device, id: 1
+2020-11-05 23:49:48  INFO: user: 2, action: link, owner: user, id: 2, property: device, id: 1
