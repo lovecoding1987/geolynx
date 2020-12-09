@@ -28,25 +28,47 @@ export const initMapboxMap = async (map, onLoaded) => {
 
 export default class MapView {
     constructor() {
+        // Add map container
         this.container = document.createElement('div');
         this.container.style.width = '100%';
         this.container.style.height = '100%';
         this.container.style.position = 'relative';
 
+        // Add google map container
+        this.googleContainer = document.createElement('div');
+        this.googleContainer.id = 'google';
+        this.googleContainer.style.width = '100%';
+        this.googleContainer.style.height = '100%';
+        this.container.appendChild(this.googleContainer);
+
+        // Add mapbox map container
         this.mapboxContainer = document.createElement('div');
         this.mapboxContainer.id = 'mapbox';
         this.mapboxContainer.style.width = '100%';
         this.mapboxContainer.style.height = '100%';
-
         this.container.appendChild(this.mapboxContainer);
 
+        // Add windy map container
+        this.windyContainer = document.createElement('div');
+        this.windyContainer.id = 'windy';
+        this.windyContainer.style.width = '100%';
+        this.windyContainer.style.height = '100%';
+        this.container.appendChild(this.windyContainer);
+
+
+        this.center = [-64.3121, -42.4128];
+        this.zoom = 3;
+        this.initializeMapboxMap();
+    }
+
+    initializeMapboxMap() {
         mapboxgl.accessToken = 'pk.eyJ1IjoiaW5jbGFuZnVuayIsImEiOiJja2dlNnM3MGIwNm4zMnlwaHo3M3J2bzU4In0.LUlcK4IiLIEY_ssxmzXgKQ';
         this.mapboxMap = new mapboxgl.Map({
             container: this.mapboxContainer,
             style: styleOsm(),
             animate: false,
-            center: [-64.3121, -42.4128],
-            zoom: 3
+            center: this.center,
+            zoom: this.zoom
         });
 
         this.mapboxMap.on('load', () => initMapboxMap(this.mapboxMap, this.onLoadedMapboxMap));
@@ -73,17 +95,13 @@ export default class MapView {
         this.mapboxMap.addControl(this.mapboxDraw);
         this.mapboxMap.addControl(new GeoJsonControl(this.mapboxDraw));
 
-
-        this.windyContainer = document.createElement('div');
-        this.windyContainer.id = 'windy';
-        this.windyContainer.style.width = '100%';
-        this.windyContainer.style.height = '100%';
-
-        this.container.appendChild(this.windyContainer);
-
         this.map = this.mapboxMap
 
         this.mapProvider = 'mapbox'
+    }
+
+    initializeGoogleMap() {
+        
     }
 
     getMap() {
@@ -138,7 +156,7 @@ export default class MapView {
         if (styleId === 'mapWinds' || styleId === 'mapTemperatures') {
             this.map = this.windyMap;
             this.mapProvider = 'windy';
-        } else if (styleId === 'mapGoogle') {
+        } else if (styleId === 'mapGoogleSatellite' || styleId === 'mapGoogleHybrid') {
             this.map = this.googleMap;
             this.mapProvider = 'google';
         } else {
@@ -154,6 +172,7 @@ export default class MapView {
     }
 
     getCenter() {
+        if (this.mapProvider === 'google') return {lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng()}
         return this.map.getCenter()
     }
 
@@ -165,6 +184,9 @@ export default class MapView {
         this.windyStore = store;
     }
 
+    setGoogleMap(map) {
+        this.googleMap = map; 
+    }
     setMapProvider(provider) {
         this.mapProvider = provider;
     }

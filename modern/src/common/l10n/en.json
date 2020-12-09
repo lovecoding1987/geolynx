@@ -121,7 +121,7 @@
     "errorSocket": "Web socket connection error",
     "errorZero": "Can't be zero",
     "userName": "Name",
-    "userEmail": "Email",
+    "userEmail": "Email or username",
     "userPassword": "Password",
     "userAdmin": "Admin",
     "userRemember": "Remember",
@@ -477,5 +477,7 @@
     "blue": "Blue",
     "green": "Green",
     "orange": "Orange",
-    "grey": "Grey"
+    "grey": "Grey",
+    "satellite": "Satellite",
+    "hybrid": "Hybrid"
 }

@@ -1,4 +1,5 @@
-const options = {
+// Initialize Windy API
+windyInit({
     key: '2677t825ITJyjNOy759Q0ZwJLJvrBmT9',
     verbose: false,
 
@@ -6,10 +7,7 @@ const options = {
     lat: 0,
     lon: 0,
     zoom: 0,
-};
-
-// Initialize Windy API
-windyInit(options, windyAPI => {
+}, windyAPI => {
     const { store, map, picker, utils, overlays } = windyAPI;
 
     overlays.wind.setMetric('km/h')
@@ -18,9 +16,9 @@ windyInit(options, windyAPI => {
         picker.open({ lat: lat, lon: lng });
     })
 
-    onChangeMapStyle = (e) => { 
-        const {styleId, center, zoom} = e.detail
-        map.setView(new L.LatLng(center.lat, center.lng), zoom);
+    onShowWindyMap = (e) => { 
+        const {oldMapProvider, styleId, center, zoom} = e.detail; console.log(oldMapProvider, styleId)
+        map.setView(new L.LatLng(center.lat, center.lng), oldMapProvider === 'mapbox' ? zoom + 1 : zoom);
         if (styleId === 'mapWinds') {
             store.set('overlay', 'wind');
         } else if (styleId === 'mapTemperatures') {
@@ -29,9 +27,9 @@ windyInit(options, windyAPI => {
     }
     
     if (document.addEventListener) {
-        document.addEventListener('changeMapStyle', onChangeMapStyle, false);
+        document.addEventListener('showWindyMap', onShowWindyMap, false);
     } else {
-        document.attachEvent('changeMapStyle', onChangeMapStyle);
+        document.attachEvent('showWindyMap', onShowWindyMap);
     }
 
     document.dispatchEvent(new CustomEvent('setWindyMap', {

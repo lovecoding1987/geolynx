@@ -5,7 +5,7 @@ import './switcher/switcher.css';
 import { styleMapbox, styleOsm } from './mapStyles';
 import t from '../common/localization';
 import DrawPopover from '../DrawPopover';
-import MapView, {initMapboxMap} from './MapView';
+import MapView, { initMapboxMap } from './MapView';
 
 const mapView = new MapView();
 export const map = mapView.mapboxMap;
@@ -34,22 +34,24 @@ mapView.onLoadedMapboxMap = () => {
 mapView.addControl(new SwitcherControl(
   [
     { id: 'mapOsm', title: t('mapOsm'), uri: styleOsm() },
+    { id: 'mapGoogleSatellite', title: t('satellite'), uri: '' },
+    { id: 'mapGoogleHybrid', title: t('hybrid'), uri: '' },
     { id: 'mapMapboxGround', title: t('ground'), uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
     { id: 'mapMapboxVegetation', title: t('vegetation'), uri: styleMapbox('ckgh3eou302i219pbebto8f0c') },
     { id: 'mapMapboxApplications', title: t('applications'), uri: styleMapbox('ckhhgcqyq08or19mixazio9js') },
     { id: 'mapMapboxDemo', title: t('demo'), uri: styleMapbox('ckhl25qo906em19mcaj1x2evp') },
-    { id: 'mapWinds', title: t('winds'), uri: ''},
-    { id: 'mapTemperatures', title: t('temperatures'), uri: ''},
+    { id: 'mapWinds', title: t('winds'), uri: '' },
+    { id: 'mapTemperatures', title: t('temperatures'), uri: '' },
     {
       id: 'mapFIRMS',
       title: t('hot_spots'),
       uri: styleMapbox('ckhvoc3ym0grz19k72icogk47'),
-      checkboxes:[
-        {id: 'mapFIRMS-24hrs', title: `24 ${t('hrs')}`},
-        {id: 'mapFIRMS-48hrs', title: `48 ${t('hrs')}`},
-        {id: 'mapFIRMS-7days', title: `7 ${t('days')}`},
+      checkboxes: [
+        { id: 'mapFIRMS-24hrs', title: `24 ${t('hrs')}` },
+        { id: 'mapFIRMS-48hrs', title: `48 ${t('hrs')}` },
+        { id: 'mapFIRMS-7days', title: `7 ${t('days')}` },
       ]
-    }    
+    }
   ],
   'mapOsm',
   (styleId) => {
@@ -62,7 +64,7 @@ mapView.addControl(new SwitcherControl(
         if (!mapView.loaded()) {
           setTimeout(waiting, 100);
         } else {
-          initMapboxMap(map, () => {updateReadyValue(true)});
+          initMapboxMap(map, () => { updateReadyValue(true) });
         }
       };
       waiting();
@@ -70,23 +72,15 @@ mapView.addControl(new SwitcherControl(
   },
 ));
 
-const Map = ({ children, mapStyle }) => { 
+const Map = ({ children, mapStyle }) => {
   const containerEl = useRef(null);
 
   const [mapReady, setMapReady] = useState(false);
   const [popoverData, setPopoverData] = useState(null);
 
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = "/windy.js";
-    script.async = true;
-    document.body.appendChild(script);
-  return () => {
-      document.body.removeChild(script);
-    }
-  }, []);
 
-  useEffect(() => {   
+
+  useEffect(() => {
     const onSetWindyMap = (e) => {
       mapView.setWindyMap(e.detail.map);
       mapView.setWindyStore(e.detail.store);
@@ -95,6 +89,17 @@ const Map = ({ children, mapStyle }) => {
 
     return () => {
       document.removeEventListener("setWindyMap", onSetWindyMap);
+    }
+  })
+
+  useEffect(() => {
+    const onSetGoogleMap = (e) => {
+      mapView.setGoogleMap(e.detail.map);
+    }
+    document.addEventListener('setGoogleMap', onSetGoogleMap, false);
+
+    return () => {
+      document.removeEventListener("setGoogleMap", onSetGoogleMap);
     }
   })
 
@@ -132,7 +137,7 @@ const Map = ({ children, mapStyle }) => {
     mapView.mapboxDraw.setFeatureProperty(featureId, 'icon', icon);
   }
 
-  const popoverOpen = popoverData !== null; 
+  const popoverOpen = popoverData !== null;
   return (
     <div style={{ width: '100%', height: '100%' }} ref={containerEl}>
       {mapReady && children}

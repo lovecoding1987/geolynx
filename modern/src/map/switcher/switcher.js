@@ -55,7 +55,9 @@ export class SwitcherControl {
 
 
         const previousZoom = mapView.getZoom();
-        const previousCenter = mapView.getCenter();
+        const previousCenter = mapView.getCenter(); 
+
+        const oldMapProvider = mapView.mapProvider;
 
         me.beforeSwitch(styleId);
 
@@ -68,10 +70,26 @@ export class SwitcherControl {
           // Windy map
           document.getElementById('windy').style.visibility = 'visible';
           document.getElementById('mapbox').style.visibility = 'hidden';
+          document.getElementById('google').style.visibility = 'hidden';
 
-          document.dispatchEvent(new CustomEvent('changeMapStyle', {
+          document.dispatchEvent(new CustomEvent('showWindyMap', {
             detail: {
+              oldMapProvider: oldMapProvider,
               styleId: styleId,
+              zoom: previousZoom,
+              center: previousCenter
+            }
+          }));
+        } else if (styleId === 'mapGoogleSatellite' || styleId === 'mapGoogleHybrid') {
+          // Google map
+          document.getElementById('windy').style.visibility = 'hidden';
+          document.getElementById('mapbox').style.visibility = 'hidden';
+          document.getElementById('google').style.visibility = 'visible';
+
+          document.dispatchEvent(new CustomEvent('showGoogleMap', {
+            detail: {
+              oldMapProvider: oldMapProvider,
+              styleId: styleId.replace('mapGoogle', '').toLowerCase(),
               zoom: previousZoom,
               center: previousCenter
             }
@@ -80,12 +98,13 @@ export class SwitcherControl {
           // Mapbox map
           document.getElementById('windy').style.visibility = 'hidden';
           document.getElementById('mapbox').style.visibility = 'visible';
+          document.getElementById('google').style.visibility = 'hidden';
 
           mapboxgl.accessToken = config.MAPBOX_ACCESS_TOKEN;
           mapView.map.setStyle(JSON.parse(srcElement.dataset.uri));
 
           mapView.map.setCenter([previousCenter.lng, previousCenter.lat]);
-          mapView.map.setZoom(previousZoom);
+          mapView.map.setZoom(oldMapProvider !== 'mapbox' ? previousZoom - 1 : previousZoom);
         }
         me.afterSwitch();
         me.mapStyleContainer.style.display = 'none';
