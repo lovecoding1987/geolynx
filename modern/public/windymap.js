@@ -1,3 +1,4 @@
+window.windymapLoaded = true;
 // Initialize Windy API
 windyInit({
     key: '2677t825ITJyjNOy759Q0ZwJLJvrBmT9',
@@ -17,7 +18,7 @@ windyInit({
     })
 
     onShowWindyMap = (e) => { 
-        const {oldMapProvider, styleId, center, zoom} = e.detail; console.log(oldMapProvider, styleId)
+        const {oldMapProvider, styleId, center, zoom} = e.detail; 
         map.setView(new L.LatLng(center.lat, center.lng), oldMapProvider === 'mapbox' ? zoom + 1 : zoom);
         if (styleId === 'mapWinds') {
             store.set('overlay', 'wind');

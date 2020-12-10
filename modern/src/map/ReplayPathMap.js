@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import { useEffect } from 'react';
-import { map } from './Map';
+import { mapboxMap as map } from './Map';
 
 const ReplayPathMap = ({ positions }) => {
   const id = 'replay';

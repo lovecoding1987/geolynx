@@ -4,11 +4,13 @@ import { SwitcherControl } from './switcher/switcher';
 import './switcher/switcher.css';
 import { styleMapbox, styleOsm } from './mapStyles';
 import t from '../common/localization';
-import DrawPopover from '../DrawPopover';
+import DrawPopover from './DrawPopover';
 import MapView, { initMapboxMap } from './MapView';
 
-const mapView = new MapView();
-export const map = mapView.mapboxMap;
+export const mapView = new MapView();
+
+export const mapboxMap = mapView.mapboxMap;
+export const googleMap = mapView.googleMap;
 
 let ready = false;
 const readyListeners = new Set();
@@ -64,7 +66,7 @@ mapView.addControl(new SwitcherControl(
         if (!mapView.loaded()) {
           setTimeout(waiting, 100);
         } else {
-          initMapboxMap(map, () => { updateReadyValue(true) });
+          initMapboxMap(mapboxMap, () => { updateReadyValue(true) });
         }
       };
       waiting();
@@ -78,6 +80,38 @@ const Map = ({ children, mapStyle }) => {
   const [mapReady, setMapReady] = useState(false);
   const [popoverData, setPopoverData] = useState(null);
 
+
+  useEffect(() => {
+    if (window.googlemapLoaded) return;
+
+    
+    const googleAPIScript = document.createElement('script');
+    googleAPIScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDyXPc-p1DO_LVfuV-05JCzk8TO096r-TE&callback=initGoogleMap`;
+    document.head.appendChild(googleAPIScript);
+
+    const script = document.createElement('script');
+    script.src = "/googlemap.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    }
+
+  }, []);
+
+  
+  useEffect(() => {
+    if (window.windymapLoaded) return;
+
+    const script = document.createElement('script');
+    script.src = "/windymap.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    }
+  }, []);
 
 
   useEffect(() => {

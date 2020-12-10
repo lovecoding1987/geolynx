@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import mapboxgl from 'mapbox-gl';
 import { Provider, useSelector } from 'react-redux';
 
-import { map } from './Map';
+import { mapboxMap, mapView } from './Map';
 import store from '../store';
 import { useHistory } from 'react-router-dom';
 import StatusView from './StatusView';
@@ -23,10 +23,10 @@ const PositionsMap = ({ positions }) => {
     }
   };
 
-  const onMouseEnter = () => map.getCanvas().style.cursor = 'pointer';
-  const onMouseLeave = () => map.getCanvas().style.cursor = '';
+  const onMouseEnter = () => mapboxMap.getCanvas().style.cursor = 'pointer';
+  const onMouseLeave = () => mapboxMap.getCanvas().style.cursor = '';
 
-  const onClickCallback = useCallback(event => {
+  const onClickMapboxCallback = useCallback(event => {
     const feature = event.features[0];
     let coordinates = feature.geometry.coordinates.slice();
     while (Math.abs(event.lngLat.lng - coordinates[0]) > 180) {
@@ -47,12 +47,41 @@ const PositionsMap = ({ positions }) => {
     })
       .setDOMContent(placeholder)
       .setLngLat(coordinates)
-      .addTo(map);
+      .addTo(mapboxMap);
   }, [history]);
 
+  const onClickGoogleCallback = useCallback(event => {
+    event.feature.toGeoJson((feature) => {
+      let coordinates = feature.geometry.coordinates.slice();
+      while (Math.abs(event.latLng.lng() - coordinates[0]) > 180) {
+        coordinates[0] += event.latLng.lng() > coordinates[0] ? 360 : -360;
+      }
+
+      const placeholder = document.createElement('div');
+      ReactDOM.render(
+        <Provider store={store}>
+          <StatusView deviceId={feature.properties.deviceId} onShowDetails={positionId => history.push(`/position/${positionId}`)} />
+        </Provider>,
+        placeholder
+      );
+
+      var infowindow = new window.google.maps.InfoWindow({
+        content: placeholder,
+        position: event.feature.getGeometry().get(),
+        options: {
+          pixelOffset: new window.google.maps.Size(0, -30)
+        }
+      });
+
+      infowindow.open(mapView.googleMap)
+    }); return;
+  }, [history]);
+
+  let googleMapClickListenter;
+
   useEffect(() => {
-    if (!map.getSource(id)) {
-      map.addSource(id, {
+    if (!mapboxMap.getSource(id)) {
+      mapboxMap.addSource(id, {
         'type': 'geojson',
         'data': {
           type: 'FeatureCollection',
@@ -61,8 +90,8 @@ const PositionsMap = ({ positions }) => {
       });
     }
 
-    if (!map.getLayer(id)) {
-      map.addLayer({
+    if (!mapboxMap.getLayer(id)) {
+      mapboxMap.addLayer({
         'id': id,
         'type': 'symbol',
         'source': id,
@@ -81,36 +110,62 @@ const PositionsMap = ({ positions }) => {
           'text-halo-width': 1,
         },
       });
+
+
     }
 
-    map.on('mouseenter', id, onMouseEnter);
-    map.on('mouseleave', id, onMouseLeave);
-    map.on('click', id, onClickCallback);
+    mapboxMap.on('mouseenter', id, onMouseEnter);
+    mapboxMap.on('mouseleave', id, onMouseLeave);    
+    mapboxMap.on('click', id, onClickMapboxCallback);
 
+    const interval = setInterval(() => {
+      if (mapView.googleMap) {
+        googleMapClickListenter = mapView.googleMap.data.addListener('click', onClickGoogleCallback);
+        clearInterval(interval);
+      }
+    }, 100)
     return () => {
-      Array.from(map.getContainer().getElementsByClassName('mapboxgl-popup')).forEach(el => el.remove());
+      Array.from(mapboxMap.getContainer().getElementsByClassName('mapboxgl-popup')).forEach(el => el.remove());
 
-      map.off('mouseenter', id, onMouseEnter);
-      map.off('mouseleave', id, onMouseLeave);
-      map.off('click', id, onClickCallback);
+      mapboxMap.off('mouseenter', id, onMouseEnter);
+      mapboxMap.off('mouseleave', id, onMouseLeave);
+      mapboxMap.off('click', id, onClickMapboxCallback);
 
-      if (map.getLayer(id)) map.removeLayer(id);
-      if (map.getSource(id)) map.removeSource(id);
+      if (mapboxMap.getLayer(id)) mapboxMap.removeLayer(id);
+      if (mapboxMap.getSource(id)) mapboxMap.removeSource(id);
+
+      if (googleMapClickListenter) window.google.maps.event.removeListener(googleMapClickListenter);
     };
-  }, [onClickCallback]);
+  }, [onClickMapboxCallback]);
 
   useEffect(() => {
-    map.getSource(id).setData({
+    const features = positions.map(position => ({
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [position.longitude, position.latitude],
+      },
+      properties: createFeature(devices, position),
+    }));
+
+    mapboxMap.getSource(id).setData({
       type: 'FeatureCollection',
-      features: positions.map(position => ({
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [position.longitude, position.latitude],
-        },
-        properties: createFeature(devices, position),
-      }))
+      features: features
     });
+
+
+    const interval = setInterval(() => {
+      if (mapView.googleMap) {
+        mapView.googleMap.data.addGeoJson({
+          type: 'FeatureCollection',
+          features: features
+        });
+        mapView.googleMap.data.setStyle((feature) => ({
+          icon: `/images/icon/${feature.getProperty('category')}.png`
+        }))
+        clearInterval(interval);
+      }
+    }, 100)
   }, [devices, positions]);
 
   return null;

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-import { map } from './Map';
+import { mapboxMap } from './Map';
 
 const SelectedDeviceMap = () => {
   const mapCenter = useSelector(state => {
@@ -15,7 +15,7 @@ const SelectedDeviceMap = () => {
   });
 
   useEffect(() => {
-    map.easeTo({ center: mapCenter });
+    mapboxMap.easeTo({ center: mapCenter });
   }, [mapCenter]);
 
   return null;

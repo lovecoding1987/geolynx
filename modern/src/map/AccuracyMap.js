@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import circle from '@turf/circle';
 
-import { map } from './Map';
+import { mapboxMap } from './Map';
 
 const AccuracyMap = () => {
   const id = 'accuracy';
@@ -15,8 +15,8 @@ const AccuracyMap = () => {
   }));
 
   useEffect(() => {
-    if (!map.getSource(id)) {
-      map.addSource(id, {
+    if (!mapboxMap.getSource(id)) {
+      mapboxMap.addSource(id, {
         'type': 'geojson',
         'data': {
           type: 'FeatureCollection',
@@ -25,8 +25,8 @@ const AccuracyMap = () => {
       });
     } 
 
-    if (!map.getLayer(id)) {
-      map.addLayer({
+    if (!mapboxMap.getLayer(id)) {
+      mapboxMap.addLayer({
         'source': id,
         'id': id,
         'type': 'fill',
@@ -43,13 +43,13 @@ const AccuracyMap = () => {
     }
 
     return () => {
-      if (map.getLayer(id)) map.removeLayer(id);
-      if (map.getSource(id)) map.removeSource(id);
+      if (mapboxMap.getLayer(id)) mapboxMap.removeLayer(id);
+      if (mapboxMap.getSource(id)) mapboxMap.removeSource(id);
     };
   }, []);
 
   useEffect(() => {
-    map.getSource(id).setData(positions);
+    mapboxMap.getSource(id).setData(positions);
   }, [positions]);
 
   return null;

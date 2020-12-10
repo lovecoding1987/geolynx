@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import { Switch, Route } from 'react-router-dom'
 import CssBaseline from '@material-ui/core/CssBaseline';
 import MainPage from './MainPage';
@@ -26,35 +26,6 @@ import SummaryReportPage from './reports/SummaryReportPage';
 const App = () => {
   const initialized = useSelector(state => !!state.session.server && !!state.session.user);
 
-  useEffect(() => {
-    const googleAPIScript = document.createElement('script');
-    googleAPIScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDyXPc-p1DO_LVfuV-05JCzk8TO096r-TE&callback=initGoogleMap`;
-    googleAPIScript.defer = true;
-    document.head.appendChild(googleAPIScript);
-
-    const googleScript = document.createElement('script');
-    googleScript.src = "/googlemap.js";
-    googleScript.async = true;
-    document.body.appendChild(googleScript);
-
-    return () => {
-      document.head.removeChild(googleAPIScript);
-      document.body.removeChild(googleScript);
-    }
-
-  }, []);
-
-  
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = "/windymap.js";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    }
-  }, []);
-  
   return (
     <>
       <CssBaseline />
