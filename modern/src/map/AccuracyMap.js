@@ -49,7 +49,7 @@ const AccuracyMap = () => {
   }, []);
 
   useEffect(() => {
-    mapboxMap.getSource(id).setData(positions);
+    if (mapboxMap.getSource(id)) mapboxMap.getSource(id).setData(positions);
   }, [positions]);
 
   return null;

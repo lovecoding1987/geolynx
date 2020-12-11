@@ -3,7 +3,7 @@ import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import mapboxgl from 'mapbox-gl';
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { styleOsm } from './mapStyles';
-import { deviceCategories, markerIcons } from '../common/icons';
+import { deviceCategories, markerIcons } from '../common/constants';
 import { loadMapImage, mapDrawStyles } from './mapUtil';
 import GeoJsonControl from './GeoJsonControl';
 

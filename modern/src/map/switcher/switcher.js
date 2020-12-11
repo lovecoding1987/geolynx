@@ -115,13 +115,6 @@ export class SwitcherControl {
           elms[0].classList.remove('active');
         }
         srcElement.classList.add('active');
-
-        if (styleId !== 'mapFIRMS') {
-          const checkboxes = me.mapStyleContainer.getElementsByTagName('input');
-          for (const checkbox of checkboxes) {
-            checkbox.checked = false;
-          }
-        }
       });
 
       if (style.id === me.defaultStyle) {
@@ -164,39 +157,12 @@ export class SwitcherControl {
             me.mapStyleContainer.getElementsByClassName('mapFIRMS')[0].dispatchEvent(new Event('click'));
           }
 
-          const sources = (id) => {
-            let srcs = [];
-
-            switch (id) {
-              case 'mapFIRMS-24hrs':
-                srcs = ['mapModis-24hrs', 'mapVIIRS-S-NPP-24hrs', 'mapVIIRS-NOAA-20-24hrs'];
-                break;
-              case 'mapFIRMS-48hrs':
-                srcs = ['mapModis-48hrs', 'mapVIIRS-S-NPP-48hrs', 'mapVIIRS-NOAA-20-48hrs'];
-                break;
-              case 'mapFIRMS-7days':
-                srcs = ['mapModis-7days', 'mapVIIRS-S-NPP-7days', 'mapVIIRS-NOAA-20-7days'];
-                break;
-              default:
+          document.dispatchEvent(new CustomEvent('changeFireSelection', {
+            detail: {
+              time: event.target.dataset.id.replace('mapFIRMS-', '_'),
+              checked: event.target.checked
             }
-
-            return srcs
-          }
-
-          for (const checkbox of event.target.parentNode.parentNode.parentNode.getElementsByTagName('input')) {
-            if (checkbox !== event.target) {
-              checkbox.checked = false;
-              sources(checkbox.dataset.id).forEach(source => removeFireLayers(source, map));
-            }
-          }
-
-          if (event.target.checked) {
-            sources(event.target.dataset.id).forEach(source => addFireLayers(source, map, event.target.dataset.id));
-          } else {
-            sources(event.target.dataset.id).forEach(source => removeFireLayers(source, map));
-          }
-          me.mapStyleContainer.style.display = 'none';
-          me.styleButton.style.display = 'block';
+          }))
         });
       }
       container.appendChild(checkboxesSpan);

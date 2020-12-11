@@ -16,10 +16,12 @@ const PositionsMap = ({ positions }) => {
 
   const createFeature = (devices, position) => {
     const device = devices[position.deviceId] || null;
+    const category = device && (device.category || 'default');
     return {
       deviceId: position.deviceId,
       name: device ? device.name : '',
-      category: device && (device.category || 'default'),
+      category: category,
+      icon: `/images/icon/${category}.png`
     }
   };
 
@@ -51,30 +53,26 @@ const PositionsMap = ({ positions }) => {
   }, [history]);
 
   const onClickGoogleCallback = useCallback(event => {
-    event.feature.toGeoJson((feature) => {
-      let coordinates = feature.geometry.coordinates.slice();
-      while (Math.abs(event.latLng.lng() - coordinates[0]) > 180) {
-        coordinates[0] += event.latLng.lng() > coordinates[0] ? 360 : -360;
+    const feature = event.feature;
+    if (!feature.getProperty('deviceId')) return;
+
+    const placeholder = document.createElement('div');
+    ReactDOM.render(
+      <Provider store={store}>
+        <StatusView deviceId={feature.getProperty('deviceId')} onShowDetails={positionId => history.push(`/position/${positionId}`)} />
+      </Provider>,
+      placeholder
+    );
+
+    const infowindow = new window.google.maps.InfoWindow({
+      content: placeholder,
+      position: feature.getGeometry().get(),
+      options: {
+        pixelOffset: new window.google.maps.Size(0, -30)
       }
+    });
 
-      const placeholder = document.createElement('div');
-      ReactDOM.render(
-        <Provider store={store}>
-          <StatusView deviceId={feature.properties.deviceId} onShowDetails={positionId => history.push(`/position/${positionId}`)} />
-        </Provider>,
-        placeholder
-      );
-
-      var infowindow = new window.google.maps.InfoWindow({
-        content: placeholder,
-        position: event.feature.getGeometry().get(),
-        options: {
-          pixelOffset: new window.google.maps.Size(0, -30)
-        }
-      });
-
-      infowindow.open(mapView.googleMap)
-    }); return;
+    infowindow.open(mapView.googleMap)
   }, [history]);
 
   let googleMapClickListenter;
@@ -115,7 +113,7 @@ const PositionsMap = ({ positions }) => {
     }
 
     mapboxMap.on('mouseenter', id, onMouseEnter);
-    mapboxMap.on('mouseleave', id, onMouseLeave);    
+    mapboxMap.on('mouseleave', id, onMouseLeave);
     mapboxMap.on('click', id, onClickMapboxCallback);
 
     const interval = setInterval(() => {
@@ -134,7 +132,9 @@ const PositionsMap = ({ positions }) => {
       if (mapboxMap.getLayer(id)) mapboxMap.removeLayer(id);
       if (mapboxMap.getSource(id)) mapboxMap.removeSource(id);
 
-      if (googleMapClickListenter) window.google.maps.event.removeListener(googleMapClickListenter);
+      if (googleMapClickListenter) {
+        window.google.maps.event.removeListener(googleMapClickListenter);
+      }
     };
   }, [onClickMapboxCallback]);
 
@@ -148,10 +148,12 @@ const PositionsMap = ({ positions }) => {
       properties: createFeature(devices, position),
     }));
 
-    mapboxMap.getSource(id).setData({
-      type: 'FeatureCollection',
-      features: features
-    });
+    if (mapboxMap.getSource(id)) {
+      mapboxMap.getSource(id).setData({
+        type: 'FeatureCollection',
+        features: features
+      });
+    }
 
 
     const interval = setInterval(() => {
@@ -160,9 +162,7 @@ const PositionsMap = ({ positions }) => {
           type: 'FeatureCollection',
           features: features
         });
-        mapView.googleMap.data.setStyle((feature) => ({
-          icon: `/images/icon/${feature.getProperty('category')}.png`
-        }))
+
         clearInterval(interval);
       }
     }, 100)

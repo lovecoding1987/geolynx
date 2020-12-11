@@ -8,7 +8,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import EditAttributesView from './attributes/EditAttributesView';
 import deviceAttributes from './attributes/deviceAttributes';
 import SelectField from './form/SelectField';
-import { deviceCategories } from './common/icons';
+import { deviceCategories } from './common/constants';
 import LinkField from './form/LinkField';
 import { prefixString } from './common/stringUtils';
 

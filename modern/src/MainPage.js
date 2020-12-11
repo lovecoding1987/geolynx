@@ -11,6 +11,7 @@ import Map from './map/Map';
 import SelectedDeviceMap from './map/SelectedDeviceMap';
 import AccuracyMap from './map/AccuracyMap';
 import CurrentPositionsMap from './map/CurrentPositionsMap';
+import FiresMap from './map/FiresMap';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -88,6 +89,7 @@ const MainPage = ({ width }) => {
               <AccuracyMap />
               <CurrentPositionsMap />
               <SelectedDeviceMap />
+              <FiresMap />
             </Map>
           </ContainerDimensions>
         </div>

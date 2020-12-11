@@ -6,8 +6,8 @@ export const deviceCategories = [
   'truck'
 ];
 
-export const firmsCategories = [
-  'modis', 'viirs_snpp', 'viirs_noaa'
+export const FIRMS_CATEGORIES = [
+  'MODIS', 'VIIRS-S-NPP', 'VIIRS-NOAA-20'
 ]
 
 export const markerIcons = [

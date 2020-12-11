@@ -49,9 +49,9 @@ mapView.addControl(new SwitcherControl(
       title: t('hot_spots'),
       uri: styleMapbox('ckhvoc3ym0grz19k72icogk47'),
       checkboxes: [
-        { id: 'mapFIRMS-24hrs', title: `24 ${t('hrs')}` },
-        { id: 'mapFIRMS-48hrs', title: `48 ${t('hrs')}` },
-        { id: 'mapFIRMS-7days', title: `7 ${t('days')}` },
+        { id: 'mapFIRMS-24h', title: `24 ${t('hrs')}` },
+        { id: 'mapFIRMS-48h', title: `48 ${t('hrs')}` },
+        { id: 'mapFIRMS-7d', title: `7 ${t('days')}` },
       ]
     }
   ],
