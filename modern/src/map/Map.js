@@ -84,15 +84,15 @@ const Map = ({ children, mapStyle }) => {
   useEffect(() => {
     if (window.googlemapLoaded) return;
 
-    
-    const googleAPIScript = document.createElement('script');
-    googleAPIScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDyXPc-p1DO_LVfuV-05JCzk8TO096r-TE&callback=initGoogleMap`;
-    document.head.appendChild(googleAPIScript);
-
     const script = document.createElement('script');
     script.src = "/googlemap.js";
     script.async = true;
     document.body.appendChild(script);
+
+    
+    const googleAPIScript = document.createElement('script');
+    googleAPIScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDyXPc-p1DO_LVfuV-05JCzk8TO096r-TE&callback=initGoogleMap`;
+    document.head.appendChild(googleAPIScript);
 
     return () => {
       document.body.removeChild(script);
