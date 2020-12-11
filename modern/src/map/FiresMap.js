@@ -22,6 +22,7 @@ const createFeature = (record) => {
             coordinates: [parseFloat(record.longitude), parseFloat(record.latitude)]
         },
         properties: {
+            fire: true,
             description: `<strong>${record.title}</strong><br/>Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}`,
             description1: `${record.title}, Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}`,
             colordiff: 255 - parseInt(255 * timediff / 48)
@@ -139,7 +140,7 @@ const FiresMap = () => {
             if (mapView.googleMap) {
                 const map = mapView.googleMap;
 
-                map.data.forEach((feature) => { map.data.remove(feature) });
+                map.data.forEach((feature) => { if (feature.getProperty('fire')) map.data.remove(feature) });
 
                 if (features.length > 0) {
                     map.data.addGeoJson({
