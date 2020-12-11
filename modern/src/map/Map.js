@@ -92,6 +92,7 @@ const Map = ({ children, mapStyle }) => {
     
     const googleAPIScript = document.createElement('script');
     googleAPIScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDyXPc-p1DO_LVfuV-05JCzk8TO096r-TE&callback=initGoogleMap`;
+    googleAPIScript.defer = true;
     document.head.appendChild(googleAPIScript);
 
     return () => {
