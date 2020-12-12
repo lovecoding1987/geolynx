@@ -86,14 +86,16 @@ const Map = ({ children, mapStyle }) => {
 
     const script = document.createElement('script');
     script.src = "/googlemap.js";
-    script.sync = true;
+    script.async = true;
     document.body.appendChild(script);
 
-    console.log('>>>>>>>>>>>>>>>>> google map api loaded');
-    const googleAPIScript = document.createElement('script');
-    googleAPIScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDyXPc-p1DO_LVfuV-05JCzk8TO096r-TE&callback=initGoogleMap`;
-    googleAPIScript.sync = true;
-    document.body.appendChild(googleAPIScript);
+    setTimeout(() => {
+      console.log('>>>>>>>>>>>>>>>>> google map api loaded');
+      const googleAPIScript = document.createElement('script');
+      googleAPIScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDyXPc-p1DO_LVfuV-05JCzk8TO096r-TE&callback=initGoogleMap`;
+      googleAPIScript.sync = true;
+      document.body.appendChild(googleAPIScript);
+    }, 100)
 
     return () => {
       document.body.removeChild(script);
@@ -101,7 +103,7 @@ const Map = ({ children, mapStyle }) => {
 
   }, []);
 
-  
+
   useEffect(() => {
     if (window.windymapLoaded) return;
 
