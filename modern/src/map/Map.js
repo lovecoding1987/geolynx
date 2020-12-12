@@ -86,13 +86,13 @@ const Map = ({ children, mapStyle }) => {
 
     const script = document.createElement('script');
     script.src = "/googlemap.js";
-    script.async = true;
+    script.sync = true;
     document.body.appendChild(script);
 
     console.log('>>>>>>>>>>>>>>>>> google map api loaded');
     const googleAPIScript = document.createElement('script');
     googleAPIScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDyXPc-p1DO_LVfuV-05JCzk8TO096r-TE&callback=initGoogleMap`;
-    googleAPIScript.defer = true;
+    googleAPIScript.sync = true;
     document.body.appendChild(googleAPIScript);
 
     return () => {
