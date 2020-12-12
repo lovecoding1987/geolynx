@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { useSelector, useDispatch } from 'react-redux';
 
