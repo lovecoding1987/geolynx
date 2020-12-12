@@ -89,11 +89,11 @@ const Map = ({ children, mapStyle }) => {
     script.async = true;
     document.body.appendChild(script);
 
-    
+    console.log('>>>>>>>>>>>>>>>>> google map api loaded');
     const googleAPIScript = document.createElement('script');
     googleAPIScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDyXPc-p1DO_LVfuV-05JCzk8TO096r-TE&callback=initGoogleMap`;
     googleAPIScript.defer = true;
-    document.head.appendChild(googleAPIScript);
+    document.body.appendChild(googleAPIScript);
 
     return () => {
       document.body.removeChild(script);
