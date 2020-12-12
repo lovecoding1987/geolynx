@@ -142,12 +142,10 @@ const FiresMap = () => {
 
                 map.data.forEach((feature) => { if (feature.getProperty('fire')) map.data.remove(feature) });
 
-                if (features.length > 0) {
-                    map.data.addGeoJson({
-                        type: 'FeatureCollection',
-                        features: features
-                    });
-                }
+                map.data.addGeoJson({
+                    type: 'FeatureCollection',
+                    features: features
+                });
 
 
                 clearInterval(interval);

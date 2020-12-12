@@ -24,25 +24,25 @@ initGoogleMap = function () {
       '</svg>'
     ].join('\n');
   }
-  
+
 
   map.data.setStyle((feature) => {
-    let icon = feature.getProperty('icon');
-    const colordiff = feature.getProperty('colordiff');
+    if (feature.getProperty('fire')) {
+      const colordiff = feature.getProperty('colordiff');
 
-    let zIndex = 0;
-    if (icon) zIndex = 500;
-    if (!icon && colordiff) {
-      var svg = fireIconTemplate(`rgb(255,${255-colordiff},0)`);
-      icon = 'data:image/svg+xml;charset=UTF-8;base64,' + btoa(svg)
-      zIndex = colordiff
+      const svg = fireIconTemplate(`rgb(255,${255 - colordiff},0)`);
+
+      return {
+        icon: 'data:image/svg+xml;charset=UTF-8;base64,' + btoa(svg),
+        zIndex: colordiff,
+        title: feature.getProperty('description1')
+      };
     }
-    
+
     return {
-      icon,
-      zIndex,
-      title: feature.getProperty('description1')
-    };
+      icon: feature.getProperty('icon'),
+      zIndex: 500
+    }
   })
 
   onShowGoogleMap = (e) => {
