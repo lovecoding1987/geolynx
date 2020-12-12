@@ -1,4 +1,3 @@
-console.log('>>>>>>>>>>> googlemap consumer loaded');
 window.googlemapLoaded = true;
 
 initGoogleMap = function () {

@@ -90,7 +90,6 @@ const Map = ({ children, mapStyle }) => {
     document.body.appendChild(script);
 
     setTimeout(() => {
-      console.log('>>>>>>>>>>>>>>>>> google map api loaded');
       const googleAPIScript = document.createElement('script');
       googleAPIScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDyXPc-p1DO_LVfuV-05JCzk8TO096r-TE&callback=initGoogleMap`;
       googleAPIScript.sync = true;
