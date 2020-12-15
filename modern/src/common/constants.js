@@ -13,3 +13,5 @@ export const FIRMS_CATEGORIES = [
 export const markerIcons = [
   'home'//, 'water', 'tint', 'faucet', 'swimming-pool', 'exclamation-circle', 'biohazard', 'skull-crossbones', 'star', 'horse', 'tree'
 ]
+
+export const countries = ['Afghanistan', 'Albania', 'Algeria', 'Angola'];

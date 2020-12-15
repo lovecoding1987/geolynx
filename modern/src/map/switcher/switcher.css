@@ -6,7 +6,8 @@
 {
   margin: 10px;
 }
-.mapboxgl-ctrl-group .mapboxgl-style-list button
+.mapboxgl-ctrl-group .mapboxgl-style-list button,
+.mapboxgl-ctrl-group .mapboxgl-style-list > div
 {
   background: none;
   border: none;
@@ -18,7 +19,16 @@
   width: 100%;
   height: auto;
 }
-.mapboxgl-style-list button.indent
+.mapboxgl-ctrl-group .mapboxgl-style-list div.inner {
+  line-height: 27px;
+}
+.mapboxgl-ctrl-group .mapboxgl-style-list div.inner input,
+.mapboxgl-ctrl-group .mapboxgl-style-list div.inner select {
+  width: 150px;
+  height: 24px;
+}
+.mapboxgl-style-list button.indent,
+.mapboxgl-style-list div.indent
 {
   padding-left: 30px;
 }

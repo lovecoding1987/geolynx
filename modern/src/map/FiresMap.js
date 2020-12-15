@@ -116,7 +116,7 @@ const FiresMap = () => {
             Object.keys(data).forEach((time) => {
                 if (times.indexOf(time) > -1) {
                     const records = data[time];
-                    if (records) {
+                    if (records && records.length > 0) {
                         records.forEach(record => {
                             features.push(createFeature(record));
                         })
@@ -158,10 +158,10 @@ const FiresMap = () => {
             const { time, checked } = e.detail;
 
             if (checked) {
+                dispatch(firesActions.selectTime(time));
                 const promises = FIRMS_CATEGORIES.map(category => fetchFIRMS(category, time));
                 const items = await Promise.all(promises);
                 dispatch(firesActions.updateData({ time, items: [].concat(...items) }));
-                dispatch(firesActions.selectTime(time));
             } else {
                 dispatch(firesActions.delectTime(time));
             }

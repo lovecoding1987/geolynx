@@ -1,6 +1,8 @@
 import mapboxgl from 'mapbox-gl';
-import config from '../../config'
-import { addFireLayers, removeFireLayers } from '../FireLayers';
+import config from '../../config';
+import { countries } from '../../common/constants';
+import t from '../../common/localization';
+
 
 export class SwitcherControl {
 
@@ -126,15 +128,14 @@ export class SwitcherControl {
     }
 
     const addStyleItemWithCheckboxes = (style) => {
-      const container = document.createElement('button');
-      container.type = 'button';
+      const container = document.createElement('div');
       container.innerText = style.title;
       container.classList.add(style.id);
 
-      const checkboxesSpan = document.createElement('span');
-      checkboxesSpan.style.float = 'right';
-      checkboxesSpan.style.marginLeft = '5px';
-
+      // Add time checkboxes
+      const checkboxesDiv = document.createElement('div');
+      checkboxesDiv.style.padding = '5px';
+      
       for (const c of style.checkboxes) {
         const checkboxSpan = document.createElement('span');
 
@@ -150,23 +151,72 @@ export class SwitcherControl {
         label.innerText = c.title;
         checkboxSpan.appendChild(label);
 
-        checkboxesSpan.appendChild(checkboxSpan);
-
+        checkboxesDiv.appendChild(checkboxSpan);
+        
         checkbox.addEventListener('change', event => {
-          if (me.mapStyleContainer.getElementsByClassName('active')[0].dataset.id !== 'mapFIRMS') {
-            me.mapStyleContainer.getElementsByClassName('mapFIRMS')[0].dispatchEvent(new Event('click'));
-          }
+          const dataId = event.target.dataset.id;
+          const checked = event.target.checked;          
 
-          document.dispatchEvent(new CustomEvent('changeFireSelection', {
-            detail: {
-              time: event.target.dataset.id.replace('mapFIRMS-', '_'),
-              checked: event.target.checked
-            }
-          }))
+          if (dataId === 'mapFIRMS-old') {
+            document.getElementById('firms-filter-div').style.display = checked ? 'block' : 'none';
+          } else {
+            document.dispatchEvent(new CustomEvent('changeFireSelection', {
+              detail: {
+                time: dataId.replace('mapFIRMS-', '_'),
+                checked: checked
+              }
+            }))
+          }
         });
       }
-      container.appendChild(checkboxesSpan);
+      container.appendChild(checkboxesDiv);
 
+
+      // Add filters for FIRMS
+      const firmsFilterDiv = document.createElement('div');
+      firmsFilterDiv.id = 'firms-filter-div';
+      firmsFilterDiv.style.padding = '5px';
+      firmsFilterDiv.style.display = 'none';
+
+      const countryDiv = document.createElement('div');
+      countryDiv.classList.add('inner');
+      const countryLabel = document.createElement('label');      
+      countryLabel.innerText = `${t('country')}:`;
+      countryDiv.appendChild(countryLabel);
+      const countrySelect = document.createElement('select');
+      countrySelect.style.float = 'right';
+      countries.forEach((country) => {
+        const option = document.createElement('option');
+        option.value = country;
+        option.innerText = country;
+        countrySelect.appendChild(option);
+      })
+      countryDiv.appendChild(countrySelect);
+      firmsFilterDiv.appendChild(countryDiv);
+
+      const fromDiv = document.createElement('div');    
+      fromDiv.classList.add('inner');
+      const fromLabel = document.createElement('label');      
+      fromLabel.innerText = `${t('from')}:`;
+      fromDiv.appendChild(fromLabel);
+      const fromInput = document.createElement('input');
+      fromInput.style.float = 'right';
+      fromInput.type = "month";
+      fromDiv.appendChild(fromInput);
+      firmsFilterDiv.appendChild(fromDiv);
+
+      const toDiv = document.createElement('div');    
+      toDiv.classList.add('inner');
+      const toLabel = document.createElement('label');      
+      toLabel.innerText = `${t('to')}:`;
+      toDiv.appendChild(toLabel);
+      const toInput = document.createElement('input');
+      toInput.style.float = 'right';
+      toInput.type = "month";
+      toDiv.appendChild(toInput);
+      firmsFilterDiv.appendChild(toDiv);
+
+      container.appendChild(firmsFilterDiv);
       me.mapStyleContainer.appendChild(container);
     }
 

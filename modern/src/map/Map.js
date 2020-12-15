@@ -52,6 +52,7 @@ mapView.addControl(new SwitcherControl(
         { id: 'mapFIRMS-24h', title: `24 ${t('hrs')}` },
         { id: 'mapFIRMS-48h', title: `48 ${t('hrs')}` },
         { id: 'mapFIRMS-7d', title: `7 ${t('days')}` },
+        { id: 'mapFIRMS-old', title: t('old') },
       ]
     }
   ],

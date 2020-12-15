@@ -479,5 +479,9 @@
     "orange": "Orange",
     "grey": "Grey",
     "satellite": "Satellite",
-    "hybrid": "Hybrid"
+    "hybrid": "Hybrid",
+    "old": "Old",
+    "country": "Country",
+    "from": "From",
+    "to": "To"
 }
