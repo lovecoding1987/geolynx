@@ -11,6 +11,9 @@ import * as turf from '@turf/turf'
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import TextField from '@material-ui/core/TextField';
+import { ColorPicker } from 'material-ui-color';
+import { markerSymbols } from '../common/constants';
 
 
 
@@ -21,22 +24,28 @@ const useStyles = makeStyles((theme) => ({
     formControl: {
         margin: 0,
         minWidth: 120,
+        '& input': {
+            width: '120px',
+            textAlign: 'right'
+        }
     },
     selectEmpty: {
         marginTop: theme.spacing(2),
     },
 }));
 
-const DrawPopover = ({ id, open, anchorEl, handleClose, data, setMarkerIcon }) => {
-    const [symbol, setSymbol] = useState('');
+const DrawPopover = ({ open, anchorEl, handleClose, data, changeDrawProperties }) => {
     const classes = useStyles();
 
-    const renderPoint = () => {
-        const handleChange = (e) => {
-            setSymbol(e.target.value);
-            setMarkerIcon(data.id, e.target.value);
-        }
+    const [properties, setProperties] = useState(data.properties);
 
+    const onChangeProperty = (name, value) => {
+        properties[name] = value;
+        setProperties({ ...properties });
+        changeDrawProperties(data.id, { ...properties });
+    }
+
+    const renderPoint = () => {
         return (
             <TableContainer component={Paper}>
                 <Table className={classes.table} aria-label="simple table">
@@ -49,33 +58,46 @@ const DrawPopover = ({ id, open, anchorEl, handleClose, data, setMarkerIcon }) =
                             <TableCell component="th" scope="row">Longitude</TableCell>
                             <TableCell align="right">{data.geometry.coordinates[0].toFixed(4)}</TableCell>
                         </TableRow>
-                        {/* <TableRow>
+                        <TableRow>
                             <TableCell component="th" scope="row">Symbol</TableCell>
                             <TableCell align="right">
                                 <FormControl className={classes.formControl}>
                                     <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        value={symbol}
-                                        onChange={handleChange}
+                                        value={properties['marker-symbol'] || ''}
+                                        onChange={e => onChangeProperty('marker-symbol', e.target.value)}
                                     >
                                         <MenuItem value={""}>---</MenuItem>
-                                        <MenuItem value={"home"}>home</MenuItem>
-                                        <MenuItem value={"water"}>water</MenuItem>
-                                        <MenuItem value={"tint"}>tint</MenuItem>
-                                        <MenuItem value={"faucet"}>faucet</MenuItem>
-                                        <MenuItem value={"tint"}>tint</MenuItem>
-                                        <MenuItem value={"swimming-pool"}>swimming-pool</MenuItem>
-                                        <MenuItem value={"exclamation-circle"}>exclamation-circle</MenuItem>
-                                        <MenuItem value={"biohazard"}>biohazard</MenuItem>
-                                        <MenuItem value={"skull-crossbones"}>skull-crossbones</MenuItem>
-                                        <MenuItem value={"star"}>star</MenuItem>
-                                        <MenuItem value={"horse"}>horse</MenuItem>
-                                        <MenuItem value={"tree"}>tree</MenuItem>
+                                        {markerSymbols.map(symbol => <MenuItem key={symbol.name} value={symbol.icon}>{symbol.name}</MenuItem>)}
                                     </Select>
                                 </FormControl>
                             </TableCell>
-                        </TableRow> */}
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row">Size</TableCell>
+                            <TableCell align="right">
+                                <FormControl className={classes.formControl}>
+                                    <Select
+                                        value={properties['marker-size'] || 'medium'}
+                                        onChange={e => onChangeProperty('marker-size', e.target.value)}
+                                    >
+                                        <MenuItem value={"small"}>Small</MenuItem>
+                                        <MenuItem value={"medium"}>Medium</MenuItem>
+                                        <MenuItem value={"large"}>Large</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row">Color</TableCell>
+                            <TableCell align="right">
+                                <FormControl className={classes.formControl}>
+                                    <ColorPicker
+                                        value={properties['marker-color'] || '#7e7e7e'}
+                                        onChange={e => onChangeProperty('marker-color', e.css.backgroundColor)}
+                                    />
+                                </FormControl>
+                            </TableCell>
+                        </TableRow>
                     </TableBody>
                 </Table>
             </TableContainer>
@@ -110,6 +132,55 @@ const DrawPopover = ({ id, open, anchorEl, handleClose, data, setMarkerIcon }) =
                             <TableCell component="th" scope="row">Sq. Miles</TableCell>
                             <TableCell align="right">{(area * 3.861e-7).toFixed(2)}</TableCell>
                         </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row">Stroke</TableCell>
+                            <TableCell align="right">
+                                <FormControl className={classes.formControl}>
+                                    <ColorPicker
+                                        value={properties['stroke'] || '#D20C0C'}
+                                        onChange={e => onChangeProperty('stroke', e.css.backgroundColor)}
+                                    />
+                                </FormControl>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row">Stroke Width</TableCell>
+                            <TableCell align="right">
+                                <FormControl className={classes.formControl}>
+                                    <TextField
+                                        type="Number"
+                                        inputProps={{min: 1, max: 10, step: 0.1}}
+                                        value={properties['stroke-width'] || 2}
+                                        onChange={e => onChangeProperty('stroke-width', parseFloat(e.target.value))}
+                                    />
+                                </FormControl>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row">Fill</TableCell>
+                            <TableCell align="right">
+                                <FormControl className={classes.formControl}>
+                                    <ColorPicker
+                                        value={properties['fill'] || '#D20C0C'}
+                                        onChange={e => onChangeProperty('fill', e.css.backgroundColor)}
+                                    />
+                                </FormControl>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row">Fill Opacity</TableCell>
+                            <TableCell align="right">
+                                <FormControl className={classes.formControl}>
+                                    <TextField
+                                        type="Number"
+                                        inputProps={{min:0, max:1, step:0.1}}
+                                        value={properties['fill-opacity'] || 0.1}
+                                        onChange={e => onChangeProperty('fill-opacity', parseFloat(e.target.value))}
+                                    />
+                                </FormControl>
+                            </TableCell>
+                        </TableRow>
+
                     </TableBody>
                 </Table>
             </TableContainer>
@@ -143,6 +214,30 @@ const DrawPopover = ({ id, open, anchorEl, handleClose, data, setMarkerIcon }) =
                             <TableCell component="th" scope="row">Miles</TableCell>
                             <TableCell align="right">{turf.length(line, { units: 'miles' }).toFixed(2)}</TableCell>
                         </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row">Stroke</TableCell>
+                            <TableCell align="right">
+                                <FormControl className={classes.formControl}>
+                                    <ColorPicker
+                                        value={properties['stroke'] || '#D20C0C'}
+                                        onChange={e => onChangeProperty('stroke', e.css.backgroundColor)}
+                                    />
+                                </FormControl>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row">Stroke Width</TableCell>
+                            <TableCell align="right">
+                                <FormControl className={classes.formControl}>
+                                    <TextField
+                                        type="Number"
+                                        inputProps={{min:1, max:10, step:0.1}}
+                                        value={properties['stroke-width'] || 2}
+                                        onChange={e => onChangeProperty('stroke-width', parseFloat(e.target.value))}
+                                    />
+                                </FormControl>
+                            </TableCell>
+                        </TableRow>
                     </TableBody>
                 </Table>
             </TableContainer>
@@ -153,7 +248,7 @@ const DrawPopover = ({ id, open, anchorEl, handleClose, data, setMarkerIcon }) =
 
     return (
         <Popover
-            id={id}
+            id={data.id}
             open={open}
             anchorEl={anchorEl}
             onClose={handleClose}

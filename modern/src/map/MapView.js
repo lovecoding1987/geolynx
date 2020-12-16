@@ -3,8 +3,8 @@ import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import mapboxgl from 'mapbox-gl';
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { styleOsm } from './mapStyles';
-import { deviceCategories, markerIcons } from '../common/constants';
-import { loadMapImage, mapDrawStyles } from './mapUtil';
+import { deviceCategories } from '../common/constants';
+import { loadMapImage, loadSymbolImage, mapDrawStyles } from './mapUtil';
 import GeoJsonControl from './GeoJsonControl';
 
 
@@ -16,12 +16,8 @@ export const initMapboxMap = async (map, onLoaded) => {
         if (!map.hasImage(`${category}_grey`)) map.addImage(`${category}_grey`, await loadMapImage(map, `images/icon/${category}_grey.png`), { pixelRatio: window.devicePixelRatio });
         if (!map.hasImage(`${category}_orange`)) map.addImage(`${category}_orange`, await loadMapImage(map, `images/icon/${category}_orange.png`), { pixelRatio: window.devicePixelRatio });
     }));
-
-    await Promise.all(markerIcons.map(async icon => {
-        if (!map.hasImage(`marker-${icon}`)) map.addImage(`marker-${icon}`, await loadMapImage(map, `images/marker_${icon}.png`));
-    }));
-
-    if (!map.hasImage('marker-default')) map.addImage('marker-default', await loadMapImage(map, 'images/marker.png'));
+    
+    loadSymbolImage(map, {});
 
     if (onLoaded) onLoaded();
 };

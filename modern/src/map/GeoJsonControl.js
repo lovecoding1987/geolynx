@@ -1,4 +1,4 @@
-import { downloadGeoJson } from './mapUtil';
+import { downloadGeoJson, loadSymbolImage } from './mapUtil';
 import t from '../common/localization';
 export default class GeoJsonControl {
     constructor(draw) {
@@ -38,24 +38,24 @@ export default class GeoJsonControl {
         this.uploadInput.type = 'file';
         this.uploadInput.hidden = true;
         this.uploadInput.accept = '.json';
-        
+
         this.uploadInput.addEventListener('change', async (event) => {
             const file = event.target.files.item(0);
-
             try {
-                const geojson = JSON.parse(await file.text());
+                const geojson = JSON.parse(await file.text()); console.log(geojson)
                 if (geojson.features) {
-                    geojson.features.forEach((feature) => {
+                    geojson.features.forEach(async (feature) => {
+                        loadSymbolImage(map, feature.properties);
                         this.draw.add(feature);
                     })
                 }
             } catch (e) {
-
+                console.error(e)
             }
-            
-            
+
+
         })
-    
+
         this.controlContainer.appendChild(this.uploadInput);
 
         return this.controlContainer;

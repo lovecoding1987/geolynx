@@ -6,6 +6,7 @@ import { styleMapbox, styleOsm } from './mapStyles';
 import t from '../common/localization';
 import DrawPopover from './DrawPopover';
 import MapView, { initMapboxMap } from './MapView';
+import { loadSymbolImage } from './mapUtil';
 
 export const mapView = new MapView();
 
@@ -170,8 +171,13 @@ const Map = ({ children, mapStyle }) => {
     setPopoverData(null);
   }
 
-  const setDrawMarkerIcon = (featureId, icon) => {
-    mapView.mapboxDraw.setFeatureProperty(featureId, 'icon', icon);
+  const setDrawProperties = (featureId, data) => {
+    const draw = mapView.mapboxDraw;
+    const feature = draw.get(featureId);
+    if (feature.geometry.type === 'Point') {
+      loadSymbolImage(mapView.mapboxMap, {...feature.properties, ...data});
+    }
+    Object.keys(data).forEach(key => {mapView.mapboxDraw.setFeatureProperty(featureId, key, data[key])})
   }
 
   const popoverOpen = popoverData !== null;
@@ -179,12 +185,12 @@ const Map = ({ children, mapStyle }) => {
     <div style={{ width: '100%', height: '100%' }} ref={containerEl}>
       {mapReady && children}
 
-      <DrawPopover
+      {popoverData && <DrawPopover
         open={popoverOpen}
         handleClose={popoverHandleClose}
         data={popoverData}
-        setMarkerIcon={setDrawMarkerIcon}
-      />
+        changeDrawProperties={setDrawProperties}
+      />}
     </div>
   );
 };
