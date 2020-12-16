@@ -23,6 +23,7 @@ const createFeature = (record) => {
         },
         properties: {
             fire: true,
+            type: record.title,
             description: `<strong>${record.title}</strong><br/>Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}`,
             description1: `${record.title}, Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}`,
             colordiff: 255 - parseInt(255 * timediff / 48)
@@ -39,12 +40,14 @@ const onMapboxMouseEnter = (e) => {
     const map = mapView.mapboxMap;
     map.getCanvas().style.cursor = 'pointer';
 
-    const coordinates = e.features[0].geometry.coordinates.slice();
-    const description = e.features[0].properties.description;
+    const feature = e.features[0];
+
+    const coordinates = feature.geometry.coordinates.slice();
     while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
     }
-    popup.setLngLat(coordinates).setHTML(description).addTo(map);
+    const html = feature.layer.id === 'fires' ? feature.properties.description : `<label>MODIS: </label><span>${feature.properties['MODIS']}</span><br/><label>VIIRS-S-NPP: </label><span>${feature.properties['VIIRS-S-NPP']}</span><br/><label>VIIRS-NOAA-20: </label><span>${feature.properties['VIIRS-NOAA-20']}</span>`;
+    popup.setLngLat(coordinates).setHTML(html).addTo(map);
 }
 
 const onMapboxMouseLeave = () => {
@@ -92,7 +95,10 @@ const FiresMap = () => {
                 clusterMaxZoom: 14,
                 clusterRadius: 50,
                 clusterProperties: {
-                    'colordiff': ['+', ['get', 'colordiff']]
+                    'colordiff': ['+', ['get', 'colordiff']],
+                    'MODIS': ['+', ['case', ['==', ['get', 'type'], 'MODIS'], 1, 0]],
+                    'VIIRS-S-NPP': ['+', ['case', ['==', ['get', 'type'], 'VIIRS-S-NPP'], 1, 0]],
+                    'VIIRS-NOAA-20': ['+', ['case', ['==', ['get', 'type'], 'VIIRS-NOAA-20'], 1, 0]],
                 }
             });
         }
@@ -160,14 +166,19 @@ const FiresMap = () => {
         }
 
         mapboxMap.on('mouseenter', 'fires', onMapboxMouseEnter);
+        mapboxMap.on('mouseenter', 'clusters', onMapboxMouseEnter);
         mapboxMap.on('mouseleave', 'fires', onMapboxMouseLeave);
+        mapboxMap.on('mouseleave', 'clusters', onMapboxMouseLeave);
         mapboxMap.on('click', 'clusters', onMapboxClick);
 
 
         return () => {
             mapboxMap.off('mouseenter', 'fires', onMapboxMouseEnter);
+            mapboxMap.off('mouseenter', 'clusters', onMapboxMouseEnter);
             mapboxMap.off('mouseleave', 'fires', onMapboxMouseLeave);
+            mapboxMap.off('mouseleave', 'clusters', onMapboxMouseLeave);
             mapboxMap.off('click', 'clusters', onMapboxClick);
+            if (mapboxMap.getLayer('cluster-count')) mapboxMap.removeLayer('cluster-count');
             if (mapboxMap.getLayer('clusters')) mapboxMap.removeLayer('clusters');
             if (mapboxMap.getLayer('fires')) mapboxMap.removeLayer('fires');
             if (mapboxMap.getSource('fires')) mapboxMap.removeSource('fires');
