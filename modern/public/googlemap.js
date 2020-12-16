@@ -59,3 +59,31 @@ initGoogleMap = function () {
     document.attachEvent('showGoogleMap', onShowGoogleMap);
   }
 };
+
+ClusterIcon.prototype.createCss = function (pos) {
+  const markers = this.cluster_.getMarkers();
+  var size = 15;
+  if (markers.length < 10) { size = 15; }
+  if (markers.length > 10 && markers.length < 100) { size = 22; }
+  if (markers.length > 100 && markers.length < 1000) { size = 30; }
+  if (markers.length > 1000) { size = 37; }
+
+  const bg_color = Math.round(markers.map(m => m.colordiff).reduce((total, colordiff) => (total+colordiff)) / markers.length);
+
+
+  style = ['border-radius : 50%',
+    'cursor        : pointer',
+    'position      : absolute',
+    'top           : ' + pos.y + 'px',
+    'left          : ' + pos.x + 'px',
+    'width         : ' + size * 2 + 'px',
+    'height        : ' + size * 2 + 'px',
+    'line-height   : ' + (size * 2 + 1) + 'px',
+    'text-align    : center',
+    `background-color: rgb(255, ${255 - bg_color}, 0)`,
+    'opacity       : 0.7',
+    'color: #ffffff',
+    'font-size:14px'
+  ];
+  return style.join(";") + ';';
+};

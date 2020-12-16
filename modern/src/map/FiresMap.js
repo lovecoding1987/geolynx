@@ -8,12 +8,25 @@ import { firesActions } from '../store';
 
 import { FIRMS_CATEGORIES } from '../common/constants';
 
+const fireIconTemplate = (color) => {
+    return [
+        '<?xml version="1.0"?>',
+        '<svg width="20px" height="20px" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">',
+        `<circle stroke="${color}" fill="${color}" opacity="0.7" cx="50" cy="50" r="50"/>`,
+        '</svg>'
+    ].join('\n');
+}
 
 const createFeature = (record) => {
     const datetime = new Date(`${record.acq_date} ${record.acq_time.substring(0, 2)}:${record.acq_time.substring(2)}:00`);
     let timediff = parseInt((new Date() - datetime) / 1000 / 60 / 60);
     if (timediff < 0) timediff = 0;
     if (timediff > 48) timediff = 48;
+
+
+    const colordiff = 255 - parseInt(255 * timediff / 48);
+
+    const svg = fireIconTemplate(`rgb(255,${255 - colordiff},0)`);
 
     return {
         type: 'Feature',
@@ -26,7 +39,8 @@ const createFeature = (record) => {
             type: record.title,
             description: `<strong>${record.title}</strong><br/>Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}`,
             description1: `${record.title}, Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}`,
-            colordiff: 255 - parseInt(255 * timediff / 48)
+            colordiff: colordiff,
+            icon: 'data:image/svg+xml;charset=UTF-8;base64,' + btoa(svg)
         }
     };
 }
@@ -218,13 +232,23 @@ const FiresMap = () => {
             if (mapView.googleMap) {
                 const map = mapView.googleMap;
 
-                map.data.forEach((feature) => { if (feature.getProperty('fire')) map.data.remove(feature) });
+                // map.data.forEach((feature) => { if (feature.getProperty('fire')) map.data.remove(feature) });
 
-                map.data.addGeoJson({
-                    type: 'FeatureCollection',
-                    features: features
-                });
+                // map.data.addGeoJson({
+                //     type: 'FeatureCollection',
+                //     features: features
+                // });
 
+                const markers = features.map(feature => (
+                    new window.google.maps.Marker({
+                        position: { lat: feature.geometry.coordinates[1], lng: feature.geometry.coordinates[0] },
+                        icon: feature.properties.icon,
+                        colordiff: feature.properties.colordiff,
+                        title: feature.properties.description1
+                    })
+                ));
+
+                new window.MarkerClusterer(map, markers);
 
                 clearInterval(interval);
             }
