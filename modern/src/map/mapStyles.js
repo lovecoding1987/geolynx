@@ -7,7 +7,8 @@ export const styleCustom = (url, attribution) => ({
       attribution: attribution,
     },
   },
-  glyphs: 'https://cdn.traccar.com/map/fonts/{fontstack}/{range}.pbf',
+  //glyphs: 'https://cdn.traccar.com/map/fonts/{fontstack}/{range}.pbf',
+  glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
   layers: [{
     id: 'osm',
     type: 'raster',
@@ -35,7 +36,8 @@ export const styleCarto = () => ({
       'attribution': '© <a target="_top" rel="noopener" href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a target="_top" rel="noopener" href="https://carto.com/attribution">CARTO</a>'
     }
   },
-  'glyphs': 'https://cdn.traccar.com/map/fonts/{fontstack}/{range}.pbf',
+  //'glyphs': 'https://cdn.traccar.com/map/fonts/{fontstack}/{range}.pbf',
+  'glyphs': 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
   'layers': [
     {
       'id': 'simple-tiles',

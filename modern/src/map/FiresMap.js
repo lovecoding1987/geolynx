@@ -53,8 +53,25 @@ const onMapboxMouseLeave = () => {
     popup.remove();
 }
 
+const onMapboxClick = (e) => {
+    const map = mapView.mapboxMap;
+    var features = map.queryRenderedFeatures(e.point, {
+        layers: ['clusters']
+    });
+    var clusterId = features[0].properties.cluster_id;
+    map.getSource('fires').getClusterExpansionZoom(
+        clusterId,
+        function (err, zoom) {
+            if (err) return;
+
+            map.easeTo({
+                center: features[0].geometry.coordinates,
+                zoom: zoom
+            });
+        }
+    );
+}
 const FiresMap = () => {
-    const id = 'fires';
 
     const dispatch = useDispatch();
     const data = useSelector(state => state.fires.data);
@@ -64,46 +81,96 @@ const FiresMap = () => {
     useEffect(() => {
         const mapboxMap = mapView.mapboxMap;
 
-        if (!mapboxMap.getSource(id)) {
-            mapboxMap.addSource(id, {
-                'type': 'geojson',
-                'data': {
+        if (!mapboxMap.getSource('fires')) {
+            mapboxMap.addSource('fires', {
+                type: 'geojson',
+                data: {
                     type: 'FeatureCollection',
                     features: [],
+                },
+                cluster: true,
+                clusterMaxZoom: 14,
+                clusterRadius: 50,
+                clusterProperties: {
+                    'colordiff': ['+', ['get', 'colordiff']]
                 }
             });
         }
 
-        if (!mapboxMap.getLayer(id)) {
+        if (!mapboxMap.getLayer('clusters')) {
             mapboxMap.addLayer({
-                'id': id,
-                'type': 'circle',
-                'source': id,
-                'paint': {
-                    'circle-radius': 10,
+                id: 'clusters',
+                type: 'circle',
+                source: 'fires',
+                filter: ['has', 'point_count'],
+                paint: {
                     'circle-color': [
                         'rgb',
                         255,
-                        ['-', 255, ['get', 'colordiff']],
+                        ['-', 255,
+                            [
+                                '/',
+                                ['get', 'colordiff'],
+                                ['get', 'point_count']
+                            ]
+                        ],
                         0
                     ],
-                    'circle-blur': 0.4,
                     'circle-opacity': 0.7,
-                    //'circle-stroke-color': strokeColorByTime(time),
-                    //'circle-stroke-width': 3,
-                    //'circle-stroke-opacity': 1
+                    'circle-radius': [
+                        'step',
+                        ['get', 'point_count'],
+                        20,
+                        100,
+                        30,
+                        750,
+                        40
+                    ]
                 }
             });
         }
 
-        mapboxMap.on('mouseenter', id, onMapboxMouseEnter);
-        mapboxMap.on('mouseleave', id, onMapboxMouseLeave);
+        if (!mapboxMap.getLayer('cluster-count')) {
+            mapboxMap.addLayer({
+                id: 'cluster-count',
+                type: 'symbol',
+                source: 'fires',
+                filter: ['has', 'point_count'],
+                layout: {
+                    'text-field': '{point_count_abbreviated}',
+                    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                    'text-size': 12
+                }
+            });
+        }
+
+        if (!mapboxMap.getLayer('fires')) {
+            mapboxMap.addLayer({
+                id: 'fires',
+                type: 'circle',
+                source: 'fires',
+                filter: ['!', ['has', 'point_count']],
+                paint: {
+                    'circle-color': ['rgb', 255, ['-', 255, ['get', 'colordiff']], 0],
+                    'circle-radius': 10,
+                    'circle-blur': 0.4,
+                    'circle-opacity': 0.7
+                }
+            });
+        }
+
+        mapboxMap.on('mouseenter', 'fires', onMapboxMouseEnter);
+        mapboxMap.on('mouseleave', 'fires', onMapboxMouseLeave);
+        mapboxMap.on('click', 'clusters', onMapboxClick);
+
 
         return () => {
-            mapboxMap.off('mouseenter', id, onMapboxMouseEnter);
-            mapboxMap.off('mouseleave', id, onMapboxMouseLeave);
-            if (mapboxMap.getLayer(id)) mapboxMap.removeLayer(id);
-            if (mapboxMap.getSource(id)) mapboxMap.removeSource(id);
+            mapboxMap.off('mouseenter', 'fires', onMapboxMouseEnter);
+            mapboxMap.off('mouseleave', 'fires', onMapboxMouseLeave);
+            mapboxMap.off('click', 'clusters', onMapboxClick);
+            if (mapboxMap.getLayer('clusters')) mapboxMap.removeLayer('clusters');
+            if (mapboxMap.getLayer('fires')) mapboxMap.removeLayer('fires');
+            if (mapboxMap.getSource('fires')) mapboxMap.removeSource('fires');
         };
     }, []);
 
@@ -128,8 +195,8 @@ const FiresMap = () => {
 
         const features = getFeatures();
 
-        if (mapboxMap.getSource(id)) {
-            mapboxMap.getSource(id).setData({
+        if (mapboxMap.getSource('fires')) {
+            mapboxMap.getSource('fires').setData({
                 type: 'FeatureCollection',
                 features: features
             });
