@@ -88,7 +88,6 @@ const Map = ({ children, mapStyle }) => {
 
     const script = document.createElement('script');
     script.src = "/googlemap.js";
-    script.async = true;
     document.body.appendChild(script);
 
     setTimeout(() => {
