@@ -121,7 +121,7 @@
     "errorSocket": "Web socket connection error",
     "errorZero": "Can't be zero",
     "userName": "Name",
-    "userEmail": "Email or username",
+    "userEmail": "Email",
     "userPassword": "Password",
     "userAdmin": "Admin",
     "userRemember": "Remember",

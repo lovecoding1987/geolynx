@@ -93,6 +93,7 @@ const LoginPage = () => {
             error={failed}
             label={t('userEmail')}
             name='email'
+            type='email'
             value={email}
             autoComplete='email'
             autoFocus

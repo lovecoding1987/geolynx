@@ -114,6 +114,7 @@ const RegisterPage = () => {
             error={failed}
             label={t('userEmail')}
             name='email'
+            type='email'
             value={email}
             onChange={handleEmailChange}
             helperText={failed && 'Invalid email'} />
