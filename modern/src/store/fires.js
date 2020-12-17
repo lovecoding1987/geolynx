@@ -22,7 +22,7 @@ const { reducer, actions } = createSlice({
             const time = action.payload;
             if (state.times.indexOf(time) < 0) state.times.push(time);
         },
-        delectTime(state, action) {
+        deselectTime(state, action) {
             const time = action.payload
             const index = state.times.indexOf(time);
             if (index > -1) {

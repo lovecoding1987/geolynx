@@ -88,6 +88,9 @@ const onMapboxClick = (e) => {
         }
     );
 }
+
+let googleMarkerCluster;
+
 const FiresMap = () => {
 
     const dispatch = useDispatch();
@@ -239,6 +242,7 @@ const FiresMap = () => {
                 //     features: features
                 // });
 
+                if (googleMarkerCluster) googleMarkerCluster.clearMarkers();
                 const markers = features.map(feature => (
                     new window.google.maps.Marker({
                         position: { lat: feature.geometry.coordinates[1], lng: feature.geometry.coordinates[0] },
@@ -248,7 +252,7 @@ const FiresMap = () => {
                     })
                 ));
 
-                new window.MarkerClusterer(map, markers);
+                googleMarkerCluster = new window.MarkerClusterer(map, markers);
 
                 clearInterval(interval);
             }
@@ -265,7 +269,7 @@ const FiresMap = () => {
                 const items = await Promise.all(promises);
                 dispatch(firesActions.updateData({ time, items: [].concat(...items) }));
             } else {
-                dispatch(firesActions.delectTime(time));
+                dispatch(firesActions.deselectTime(time));
             }
         }
         document.addEventListener('changeFireSelection', onChangeFireSelection);
