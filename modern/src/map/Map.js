@@ -88,18 +88,13 @@ const Map = ({ children, mapStyle }) => {
 
     const script = document.createElement('script');
     script.src = "/googlemap.js";
+    script.async = false;
     document.body.appendChild(script);
 
-    setTimeout(() => {
-      const googleAPIScript = document.createElement('script');
-      googleAPIScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDyXPc-p1DO_LVfuV-05JCzk8TO096r-TE&callback=initGoogleMap`;
-      googleAPIScript.sync = true;
-      document.body.appendChild(googleAPIScript);
-    }, 100)
-
-    return () => {
-      document.body.removeChild(script);
-    }
+    const googleAPIScript = document.createElement('script');
+    googleAPIScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDyXPc-p1DO_LVfuV-05JCzk8TO096r-TE&callback=initGoogleMap`;
+    googleAPIScript.defer = true; 
+    document.body.appendChild(googleAPIScript);
 
   }, []);
 
@@ -174,9 +169,9 @@ const Map = ({ children, mapStyle }) => {
     const draw = mapView.mapboxDraw;
     const feature = draw.get(featureId);
     if (feature.geometry.type === 'Point') {
-      loadSymbolImage(mapView.mapboxMap, {...feature.properties, ...data});
+      loadSymbolImage(mapView.mapboxMap, { ...feature.properties, ...data });
     }
-    Object.keys(data).forEach(key => {mapView.mapboxDraw.setFeatureProperty(featureId, key, data[key])})
+    Object.keys(data).forEach(key => { mapView.mapboxDraw.setFeatureProperty(featureId, key, data[key]) })
   }
 
   const popoverOpen = popoverData !== null;

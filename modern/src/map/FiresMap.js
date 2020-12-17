@@ -300,17 +300,11 @@ const FiresMap = () => {
             const country = document.getElementsByName('firms_country')[0].value;
             const year = document.getElementsByName('firms_year')[0].value;
 
-            const url = `/firms/${year}/modis_${year}_${country}.csv`;
-
             const records = await fetchOldFIRMS(country, year);
             dispatch(firesActions.updateData({ time: '_old', items: records }));
         };
 
         document.getElementById('firms-search').addEventListener('click', onClickSearch);
-
-        return () => {
-            document.getElementById('firms-search').removeEventListener('click', onClickSearch);
-        }
     });
 
     return null;
