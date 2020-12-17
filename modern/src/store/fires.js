@@ -22,12 +22,21 @@ const { reducer, actions } = createSlice({
             const time = action.payload;
             if (state.times.indexOf(time) < 0) state.times.push(time);
         },
+        selectTimes(state, action) {
+            const times = action.payload;
+            times.forEach(time => {
+                if (state.times.indexOf(time) < 0) state.times.push(time);
+            })
+        },
         deselectTime(state, action) {
             const time = action.payload
             const index = state.times.indexOf(time);
             if (index > -1) {
                 state.times.splice(index, 1);
             }
+        },
+        deselectAllTimes(state, action) {
+            state.times = [];
         }
     }
 });

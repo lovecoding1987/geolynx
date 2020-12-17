@@ -1,7 +1,8 @@
 import mapboxgl from 'mapbox-gl';
 import config from '../../config';
-import { countries } from '../../common/constants';
+import countries from '../../common/countries';
 import t from '../../common/localization';
+import csv_parse from 'csv-parse';
 
 
 export class SwitcherControl {
@@ -57,7 +58,7 @@ export class SwitcherControl {
 
 
         const previousZoom = mapView.getZoom();
-        const previousCenter = mapView.getCenter(); 
+        const previousCenter = mapView.getCenter();
 
         const oldMapProvider = mapView.mapProvider;
 
@@ -135,7 +136,7 @@ export class SwitcherControl {
       // Add time checkboxes
       const checkboxesDiv = document.createElement('div');
       checkboxesDiv.style.padding = '5px';
-      
+
       for (const c of style.checkboxes) {
         const checkboxSpan = document.createElement('span');
 
@@ -152,27 +153,36 @@ export class SwitcherControl {
         checkboxSpan.appendChild(label);
 
         checkboxesDiv.appendChild(checkboxSpan);
-        
+
         checkbox.addEventListener('change', event => {
           const dataId = event.target.dataset.id;
-          const checked = event.target.checked;          
+          const checked = event.target.checked;
 
           if (dataId === 'mapFIRMS-old') {
             document.getElementById('firms-filter-div').style.display = checked ? 'block' : 'none';
-          } else {
-            document.dispatchEvent(new CustomEvent('changeFireSelection', {
+            document.getElementsByClassName('mapFIRMS-24h')[0].disabled = checked;
+            document.getElementsByClassName('mapFIRMS-48h')[0].disabled = checked;
+            document.getElementsByClassName('mapFIRMS-7d')[0].disabled = checked;
+
+            document.dispatchEvent(new CustomEvent('enableFireSelection', {
               detail: {
-                time: dataId.replace('mapFIRMS-', '_'),
-                checked: checked
+                enable: !checked
               }
             }))
           }
+          
+          document.dispatchEvent(new CustomEvent('changeFireSelection', {
+            detail: {
+              time: dataId.replace('mapFIRMS-', '_'),
+              checked: checked
+            }
+          }));
         });
       }
       container.appendChild(checkboxesDiv);
 
 
-      // Add filters for FIRMS
+      // Add filters for searching FIRMS
       const firmsFilterDiv = document.createElement('div');
       firmsFilterDiv.id = 'firms-filter-div';
       firmsFilterDiv.style.padding = '5px';
@@ -180,28 +190,50 @@ export class SwitcherControl {
 
       const countryDiv = document.createElement('div');
       countryDiv.classList.add('inner');
-      const countryLabel = document.createElement('label');      
+      const countryLabel = document.createElement('label');
       countryLabel.innerText = `${t('country')}:`;
       countryDiv.appendChild(countryLabel);
       const countrySelect = document.createElement('select');
+      countrySelect.name = 'firms_country';
       countrySelect.style.float = 'right';
       countries.forEach((country) => {
         const option = document.createElement('option');
-        option.value = country;
-        option.innerText = country;
+        option.value = country.name;
+        option.innerText = country.name;
         countrySelect.appendChild(option);
       })
       countryDiv.appendChild(countrySelect);
       firmsFilterDiv.appendChild(countryDiv);
 
-      const fromDiv = document.createElement('div');    
+      const today = new Date();
+      const yearDiv = document.createElement('div');
+      yearDiv.classList.add('inner');
+      const yearLabel = document.createElement('label');
+      yearLabel.innerText = `${t('year')}:`;
+      yearDiv.appendChild(yearLabel);
+      const yearSelect = document.createElement('select');
+      yearSelect.name = 'firms_year';
+      yearSelect.style.float = 'right';
+      Array(today.getFullYear() - 2000 + 1).fill().map((v, i) => i + 2000).forEach((year) => {
+        const option = document.createElement('option');
+        option.value = year;
+        option.innerText = year;
+        yearSelect.appendChild(option);
+      })
+      yearDiv.appendChild(yearSelect);
+      firmsFilterDiv.appendChild(yearDiv);
+      /*const fromDiv = document.createElement('div');    
       fromDiv.classList.add('inner');
       const fromLabel = document.createElement('label');      
       fromLabel.innerText = `${t('from')}:`;
       fromDiv.appendChild(fromLabel);
       const fromInput = document.createElement('input');
+      fromInput.name = 'firms_from';
       fromInput.style.float = 'right';
       fromInput.type = "month";
+      fromInput.min = '2000-01';
+      fromInput.max = today.getFullYear() + '-' + (today.getMonth()+1);
+      fromInput.value = '2000-01';
       fromDiv.appendChild(fromInput);
       firmsFilterDiv.appendChild(fromDiv);
 
@@ -211,10 +243,37 @@ export class SwitcherControl {
       toLabel.innerText = `${t('to')}:`;
       toDiv.appendChild(toLabel);
       const toInput = document.createElement('input');
+      toInput.name = 'firms_to';
       toInput.style.float = 'right';
       toInput.type = "month";
+      toInput.min = '2000-01';
+      toInput.max = today.getFullYear() + '-' + (today.getMonth()+1);
+      toInput.value = '2000-12';
       toDiv.appendChild(toInput);
-      firmsFilterDiv.appendChild(toDiv);
+      firmsFilterDiv.appendChild(toDiv);*/
+
+      const searchBtn = document.createElement('button');
+      searchBtn.id = 'firms-search';
+      searchBtn.innerHTML = `<span><i class="fa fa-search"></i>&nbsp;${t('search')}</span>`;
+      searchBtn.classList.add('search');
+      // searchBtn.addEventListener('click', event => {
+      //   const country = document.getElementsByName('firms_country')[0].value;
+      //   const year = document.getElementsByName('firms_year')[0].value;
+
+      //   console.log(country, year);
+      //   const url = `/firms/${year}/modis_${year}_${country}.csv`;
+
+      //   return fetch(url).then((res) => res.text().then((data) => csv_parse(data.trim(), {
+      //     columns: true,
+      //     from_line: 1
+      //   }, function (err, records) {
+      //     if (!err) {
+      //       console.log(records);
+      //     }
+      //   })))
+      // });
+
+      firmsFilterDiv.appendChild(searchBtn);
 
       container.appendChild(firmsFilterDiv);
       me.mapStyleContainer.appendChild(container);

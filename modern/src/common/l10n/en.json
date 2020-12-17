@@ -483,5 +483,7 @@
     "old": "Old",
     "country": "Country",
     "from": "From",
-    "to": "To"
+    "to": "To",
+    "search": "Search",
+    "year": "Year"
 }

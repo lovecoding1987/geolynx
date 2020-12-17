@@ -49,5 +49,3 @@ export const markerSymbols = [
   {name: 'village', icon: 'village'},
   {name: 'water', icon: 'water'},
 ]
-
-export const countries = ['Afghanistan', 'Albania', 'Algeria', 'Angola'];

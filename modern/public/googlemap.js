@@ -26,24 +26,24 @@ initGoogleMap = function () {
   }
 
 
-  map.data.setStyle((feature) => {
-    if (feature.getProperty('fire')) {
-      const colordiff = feature.getProperty('colordiff');
+  // map.data.setStyle((feature) => {
+  //   if (feature.getProperty('fire')) {
+  //     const colordiff = feature.getProperty('colordiff');
 
-      const svg = fireIconTemplate(`rgb(255,${255 - colordiff},0)`);
+  //     const svg = fireIconTemplate(`rgb(255,${255 - colordiff},0)`);
 
-      return {
-        icon: 'data:image/svg+xml;charset=UTF-8;base64,' + btoa(svg),
-        zIndex: colordiff,
-        title: feature.getProperty('description1')
-      };
-    }
+  //     return {
+  //       icon: 'data:image/svg+xml;charset=UTF-8;base64,' + btoa(svg),
+  //       zIndex: colordiff,
+  //       title: feature.getProperty('description1')
+  //     };
+  //   }
 
-    return {
-      icon: feature.getProperty('icon'),
-      zIndex: 500
-    }
-  })
+  //   return {
+  //     icon: feature.getProperty('icon'),
+  //     zIndex: 500
+  //   }
+  // })
 
   onShowGoogleMap = (e) => {
     const { oldMapProvider, styleId, center, zoom } = e.detail
@@ -59,6 +59,7 @@ initGoogleMap = function () {
     document.attachEvent('showGoogleMap', onShowGoogleMap);
   }
 };
+
 
 ClusterIcon.prototype.createCss = function (pos) {
   const markers = this.cluster_.getMarkers();
@@ -82,8 +83,8 @@ ClusterIcon.prototype.createCss = function (pos) {
     'text-align    : center',
     `background-color: rgb(255, ${255 - bg_color}, 0)`,
     'opacity       : 0.7',
-    'color: #ffffff',
-    'font-size:14px'
+    'color         : #000000',
+    'font-size     : 14px'
   ];
   return style.join(";") + ';';
 };

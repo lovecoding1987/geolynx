@@ -1,4 +1,4 @@
-import parse from 'csv-parse'
+import csv_parse from 'csv-parse'
 
 export const fetchFIRMS = (id, time) => {
     let url
@@ -16,13 +16,28 @@ export const fetchFIRMS = (id, time) => {
             return;
     }
     return new Promise((resolve, reject) => {
-        return fetch(url).then((res) => res.text().then((data) => parse(data.trim(), {
+        return fetch(url).then((res) => res.text().then((data) => csv_parse(data.trim(), {
             columns: true,
             from_line: 1
         }, function (err, records) {
             if (err) return reject(err);
 
             return resolve(records.map(r => ({...r, title: id})));
+        })))
+    })
+}
+
+export const fetchOldFIRMS = (country, year) => {
+    const url = `/firms/${year}/modis_${year}_${country}.csv`;
+    
+    return new Promise((resolve, reject) => {
+        return fetch(url).then((res) => res.text().then((data) => csv_parse(data.trim(), {
+            columns: true,
+            from_line: 1
+        }, function (err, records) {
+            if (err) return reject(err);
+
+            return resolve(records.map(r => ({...r, title: 'modis'})));
         })))
     })
 }

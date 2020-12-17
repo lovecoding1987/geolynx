@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { mapView } from './Map';
-import { fetchFIRMS } from './FetchFIRMS';
+import { fetchFIRMS, fetchOldFIRMS } from './FetchFIRMS';
 import { firesActions } from '../store';
 
 import { FIRMS_CATEGORIES } from '../common/constants';
@@ -265,19 +265,54 @@ const FiresMap = () => {
 
             if (checked) {
                 dispatch(firesActions.selectTime(time));
-                const promises = FIRMS_CATEGORIES.map(category => fetchFIRMS(category, time));
-                const items = await Promise.all(promises);
-                dispatch(firesActions.updateData({ time, items: [].concat(...items) }));
+                if (time !== '_old') {
+                    const promises = FIRMS_CATEGORIES.map(category => fetchFIRMS(category, time));
+                    const items = await Promise.all(promises);
+                    dispatch(firesActions.updateData({ time, items: [].concat(...items) }));
+                }
             } else {
                 dispatch(firesActions.deselectTime(time));
             }
         }
         document.addEventListener('changeFireSelection', onChangeFireSelection);
 
+        const onEnableFireSelection = async (e) => {
+            const { enable } = e.detail;
+
+            if (enable) {
+                if (document.getElementsByClassName('mapFIRMS-24h')[0].checked) dispatch(firesActions.selectTime('_24h'));
+                if (document.getElementsByClassName('mapFIRMS-48h')[0].checked) dispatch(firesActions.selectTime('_48h'));
+                if (document.getElementsByClassName('mapFIRMS-7d')[0].checked) dispatch(firesActions.selectTime('_7d'));
+            } else {
+                dispatch(firesActions.deselectAllTimes());
+            }
+        }
+        document.addEventListener('enableFireSelection', onEnableFireSelection);
+
         return () => {
             document.removeEventListener('changeFireSelection', onChangeFireSelection);
+            document.removeEventListener('enableFireSelection', onEnableFireSelection);
         }
-    })
+    });
+
+    useEffect(() => {
+        const onClickSearch = async () => {
+            const country = document.getElementsByName('firms_country')[0].value;
+            const year = document.getElementsByName('firms_year')[0].value;
+
+            const url = `/firms/${year}/modis_${year}_${country}.csv`;
+
+            const records = await fetchOldFIRMS(country, year);
+            dispatch(firesActions.updateData({ time: '_old', items: records }));
+        };
+
+        document.getElementById('firms-search').addEventListener('click', onClickSearch);
+
+        return () => {
+            document.getElementById('firms-search').removeEventListener('click', onClickSearch);
+        }
+    });
+
     return null;
 }
 
