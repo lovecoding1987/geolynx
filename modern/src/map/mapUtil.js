@@ -233,3 +233,35 @@ export const mapDrawStyles = [
     }
   }
 ]
+
+export const colorByMonth = (month) => {
+  switch (month) {
+    case 1: return '#800000';
+    case 2: return '#e6194b';
+    case 3: return '#f58230';
+    case 4: return '#ffe119';
+    case 5: return '#d2f53c';
+    case 6: return '#3cb44b';
+    case 7: return '#46f0f0';
+    case 8: return '#0082c8';
+    case 9: return '#911eb4';
+    case 10: return '#f032e6';
+    case 11: return '#808080';
+    case 12: return '#000000';
+  }
+}
+
+export const colorByHoursDiff = (hoursDiff) => {
+  if (hoursDiff < 2) return '#ea3231';
+  if (2 <= hoursDiff && hoursDiff < 4) return '#ea5132';
+  if (4 <= hoursDiff && hoursDiff < 6) return '#eb7032';
+  if (6 <= hoursDiff && hoursDiff < 8) return '#eb8f33';
+  if (8 <= hoursDiff && hoursDiff < 10) return '#ecae34';
+  if (10 <= hoursDiff && hoursDiff < 12) return '#edcd35';
+  if (12 <= hoursDiff && hoursDiff < 14) return '#edec35';
+  if (14 <= hoursDiff && hoursDiff < 16) return '#d0ed36';
+  if (16 <= hoursDiff && hoursDiff < 18) return '#b3ee37';
+  if (18 <= hoursDiff && hoursDiff < 20) return '#95ee38';
+  if (20 <= hoursDiff && hoursDiff < 22) return '#5af039';
+  return '#3df03a';
+}

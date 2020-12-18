@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { useSelector, useDispatch } from 'react-redux';
-
+import hexRgb from 'hex-rgb';
 import { mapView } from './Map';
 import { fetchFIRMS, fetchOldFIRMS } from './FetchFIRMS';
 import { firesActions } from '../store';
 
 import { FIRMS_CATEGORIES } from '../common/constants';
+import { colorByHoursDiff, colorByMonth } from './mapUtil';
 
 const fireIconTemplate = (color) => {
     return [
@@ -19,14 +20,13 @@ const fireIconTemplate = (color) => {
 
 const createFeature = (record) => {
     const datetime = new Date(`${record.acq_date} ${record.acq_time.substring(0, 2)}:${record.acq_time.substring(2)}:00`);
-    let timediff = parseInt((new Date() - datetime) / 1000 / 60 / 60);
-    if (timediff < 0) timediff = 0;
-    if (timediff > 48) timediff = 48;
+    const timediff = parseInt((new Date() - datetime) / 1000 / 60 / 60); 
 
 
-    const colordiff = 255 - parseInt(255 * timediff / 48);
-
-    const svg = fireIconTemplate(`rgb(255,${255 - colordiff},0)`);
+    const color = record.old ? colorByMonth(datetime.getMonth() + 1) : colorByHoursDiff(timediff);
+    
+    const colorRgb = hexRgb(color);
+    const svg = fireIconTemplate(color);
 
     return {
         type: 'Feature',
@@ -36,10 +36,13 @@ const createFeature = (record) => {
         },
         properties: {
             fire: true,
-            type: record.title,
-            description: `<strong>${record.title}</strong><br/>Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}`,
-            description1: `${record.title}, Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}`,
-            colordiff: colordiff,
+            type: record.type,
+            description: `<strong>${record.type}</strong><br/>Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}`,
+            description1: `${record.type}, Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}`,
+            color: color,
+            colorR: colorRgb.red,
+            colorG: colorRgb.green,
+            colorB: colorRgb.blue,
             icon: 'data:image/svg+xml;charset=UTF-8;base64,' + btoa(svg)
         }
     };
@@ -112,7 +115,9 @@ const FiresMap = () => {
                 clusterMaxZoom: 14,
                 clusterRadius: 50,
                 clusterProperties: {
-                    'colordiff': ['+', ['get', 'colordiff']],
+                    'colorR': ['+', ['get', 'colorR']],
+                    'colorG': ['+', ['get', 'colorG']],
+                    'colorB': ['+', ['get', 'colorB']],
                     'MODIS': ['+', ['case', ['==', ['get', 'type'], 'MODIS'], 1, 0]],
                     'VIIRS-S-NPP': ['+', ['case', ['==', ['get', 'type'], 'VIIRS-S-NPP'], 1, 0]],
                     'VIIRS-NOAA-20': ['+', ['case', ['==', ['get', 'type'], 'VIIRS-NOAA-20'], 1, 0]],
@@ -129,15 +134,9 @@ const FiresMap = () => {
                 paint: {
                     'circle-color': [
                         'rgb',
-                        255,
-                        ['-', 255,
-                            [
-                                '/',
-                                ['get', 'colordiff'],
-                                ['get', 'point_count']
-                            ]
-                        ],
-                        0
+                        ['/', ['get', 'colorR'], ['get', 'point_count']],
+                        ['/', ['get', 'colorG'], ['get', 'point_count']],
+                        ['/', ['get', 'colorB'], ['get', 'point_count']]
                     ],
                     'circle-opacity': 0.7,
                     'circle-radius': [
@@ -174,7 +173,7 @@ const FiresMap = () => {
                 source: 'fires',
                 filter: ['!', ['has', 'point_count']],
                 paint: {
-                    'circle-color': ['rgb', 255, ['-', 255, ['get', 'colordiff']], 0],
+                    'circle-color': ['get', 'color'],
                     'circle-radius': 10,
                     'circle-blur': 0.4,
                     'circle-opacity': 0.7
@@ -247,7 +246,10 @@ const FiresMap = () => {
                     new window.google.maps.Marker({
                         position: { lat: feature.geometry.coordinates[1], lng: feature.geometry.coordinates[0] },
                         icon: feature.properties.icon,
-                        colordiff: feature.properties.colordiff,
+                        color: feature.properties.color,
+                        colorR: feature.properties.colorR,
+                        colorG: feature.properties.colorG,
+                        colorB: feature.properties.colorB,
                         title: feature.properties.description1
                     })
                 ));

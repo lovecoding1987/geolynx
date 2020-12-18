@@ -22,7 +22,7 @@ export const fetchFIRMS = (id, time) => {
         }, function (err, records) {
             if (err) return reject(err);
 
-            return resolve(records.map(r => ({...r, title: id})));
+            return resolve(records.map(r => ({...r, type: id})));
         })))
     })
 }
@@ -37,7 +37,7 @@ export const fetchOldFIRMS = (country, year) => {
         }, function (err, records) {
             if (err) return reject(err);
 
-            return resolve(records.map(r => ({...r, title: 'modis'})));
+            return resolve(records.map(r => ({...r, type: 'modis', old: true})));
         })))
     })
 }

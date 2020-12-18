@@ -69,7 +69,9 @@ ClusterIcon.prototype.createCss = function (pos) {
   if (markers.length > 100 && markers.length < 1000) { size = 30; }
   if (markers.length > 1000) { size = 37; }
 
-  const bg_color = Math.round(markers.map(m => m.colordiff).reduce((total, colordiff) => (total+colordiff)) / markers.length);
+  const colorR = Math.round(markers.map(m => m.colorR).reduce((total, r) => (total+r)) / markers.length);
+  const colorG = Math.round(markers.map(m => m.colorG).reduce((total, g) => (total+g)) / markers.length);
+  const colorB = Math.round(markers.map(m => m.colorB).reduce((total, b) => (total+b)) / markers.length);
 
 
   style = ['border-radius : 50%',
@@ -81,7 +83,7 @@ ClusterIcon.prototype.createCss = function (pos) {
     'height        : ' + size * 2 + 'px',
     'line-height   : ' + (size * 2 + 1) + 'px',
     'text-align    : center',
-    `background-color: rgb(255, ${255 - bg_color}, 0)`,
+    `background-color: rgb(${colorR}, ${colorG}, ${colorB})`,
     'opacity       : 0.7',
     'color         : #000000',
     'font-size     : 14px'
