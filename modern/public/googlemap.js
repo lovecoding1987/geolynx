@@ -1,6 +1,4 @@
-window.googlemapLoaded = true;
-
-window.initGoogleMap = function () {
+window.initGoogleMap = function () {console.log('>>>>>>>>>>>>>>>>>>>>>>>>')
   const map = new google.maps.Map(document.getElementById('google'), {
     center: { lat: -42.4128, lng: -64.3121 },
     zoom: 4,
