@@ -271,6 +271,7 @@
     "mapbox": "Mapbox",
     "terran": "Terran",
     "ground": "Ground",
+    "ground_terrain": "Ground - Terrain",
     "vegetation": "Vegetation",
     "applications": "Applications",
     "demo": "Demo",

@@ -39,7 +39,7 @@ mapView.addControl(new SwitcherControl(
     { id: 'mapOsm', title: t('mapOsm'), uri: styleOsm() },
     { id: 'mapGoogleSatellite', title: t('satellite'), uri: '' },
     { id: 'mapGoogleHybrid', title: t('hybrid'), uri: '' },
-    { id: 'mapMapboxGround', title: t('ground'), uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
+    { id: 'mapMapboxGround', title: t('ground_terrain'), uri: styleMapbox('ckgnq6z3g0cpk1amqw19grzdk') },
     { id: 'mapMapboxVegetation', title: t('vegetation'), uri: styleMapbox('ckgh3eou302i219pbebto8f0c') },
     { id: 'mapMapboxApplications', title: t('applications'), uri: styleMapbox('ckhhgcqyq08or19mixazio9js') },
     { id: 'mapMapboxDemo', title: t('demo'), uri: styleMapbox('ckhl25qo906em19mcaj1x2evp') },
