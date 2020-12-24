@@ -30,7 +30,7 @@ export const formatPosition = (value, key) => {
 };
 
 export const formatBoolean = (value) => {
-  return value ? t('sharedYes') : t('sharedNo');
+  return value === true ? t('sharedYes') : t('sharedNo');
 };
 
 export const formatNumber = (value, precision = 1) => {

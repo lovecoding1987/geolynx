@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 import t from './common/localization';
 import userAttributes from './attributes/userAttributes';
@@ -34,21 +36,31 @@ const UserPage = () => {
               <TextField
                 margin="normal"
                 defaultValue={item.name}
-                onChange={event => setItem({...item, name: event.target.value})}
+                onChange={event => setItem({ ...item, name: event.target.value })}
                 label={t('sharedName')}
                 variant="filled" />
               <TextField
                 margin="normal"
                 defaultValue={item.email}
-                onChange={event => setItem({...item, email: event.target.value})}
+                onChange={event => setItem({ ...item, email: event.target.value })}
                 label={t('userEmail')}
                 variant="filled" />
               <TextField
                 margin="normal"
                 type="password"
-                onChange={event => setItem({...item, password: event.target.value})}
+                onChange={event => setItem({ ...item, password: event.target.value })}
                 label={t('userPassword')}
                 variant="filled" />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={item.administrator}
+                    onChange={event => {setItem({ ...item, administrator: event.target.checked })}}
+                    color="primary"
+                  />
+                }
+                label={t('userAdmin')}
+              />
             </AccordionDetails>
           </Accordion>
           {/* <Accordion>
