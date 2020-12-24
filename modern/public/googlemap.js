@@ -1,4 +1,4 @@
-window.initGoogleMap = function () {console.log('>>>>>>>>>>>>>>>>>>>>>>>>')
+window.initGoogleMap = function () {
   const map = new google.maps.Map(document.getElementById('google'), {
     center: { lat: -42.4128, lng: -64.3121 },
     zoom: 4,
@@ -24,24 +24,12 @@ window.initGoogleMap = function () {console.log('>>>>>>>>>>>>>>>>>>>>>>>>')
   }
 
 
-  // map.data.setStyle((feature) => {
-  //   if (feature.getProperty('fire')) {
-  //     const colordiff = feature.getProperty('colordiff');
-
-  //     const svg = fireIconTemplate(`rgb(255,${255 - colordiff},0)`);
-
-  //     return {
-  //       icon: 'data:image/svg+xml;charset=UTF-8;base64,' + btoa(svg),
-  //       zIndex: colordiff,
-  //       title: feature.getProperty('description1')
-  //     };
-  //   }
-
-  //   return {
-  //     icon: feature.getProperty('icon'),
-  //     zIndex: 500
-  //   }
-  // })
+  map.data.setStyle((feature) => {
+    return {
+      icon: feature.getProperty('icon'),
+      zIndex: 500
+    }
+  })
 
   onShowGoogleMap = (e) => {
     const { oldMapProvider, styleId, center, zoom } = e.detail
