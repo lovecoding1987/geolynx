@@ -268,9 +268,11 @@ const FiresMap = () => {
             if (checked) {
                 dispatch(firesActions.selectTime(time));
                 if (time !== '_old') {
+                    dispatch(firesActions.setLoading(true));
                     const promises = FIRMS_CATEGORIES.map(category => fetchFIRMS(category, time));
                     const items = await Promise.all(promises);
                     dispatch(firesActions.updateData({ time, items: [].concat(...items) }));
+                    dispatch(firesActions.setLoading(false));
                 }
             } else {
                 dispatch(firesActions.deselectTime(time));
@@ -302,8 +304,10 @@ const FiresMap = () => {
             const country = document.getElementsByName('firms_country')[0].value;
             const year = document.getElementsByName('firms_year')[0].value;
 
+            dispatch(firesActions.setLoading(true));
             const records = await fetchOldFIRMS(country, year);
             dispatch(firesActions.updateData({ time: '_old', items: records }));
+            dispatch(firesActions.setLoading(false));
         };
 
         document.getElementById('firms-search').addEventListener('click', onClickSearch);

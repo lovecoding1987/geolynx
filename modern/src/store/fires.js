@@ -9,7 +9,8 @@ const { reducer, actions } = createSlice({
             _48h: {},
             _7d: {},
         },
-        times: []
+        times: [],
+        loading: false
     },
     reducers: {
         updateData(state, action) {
@@ -37,6 +38,9 @@ const { reducer, actions } = createSlice({
         },
         deselectAllTimes(state, action) {
             state.times = [];
+        },
+        setLoading(state, action) {
+            state.loading = action.payload;            
         }
     }
 });

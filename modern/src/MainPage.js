@@ -1,8 +1,11 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { isWidthUp, makeStyles, withWidth } from '@material-ui/core';
 import Drawer from '@material-ui/core/Drawer';
 import Fab from '@material-ui/core/Fab';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import ContainerDimensions from 'react-container-dimensions';
 import DevicesList from './DevicesList';
@@ -40,6 +43,10 @@ const useStyles = makeStyles(theme => ({
   mapContainer: {
     flexGrow: 1,
   },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
 }));
 
 const MainPage = ({ width }) => {
@@ -47,6 +54,7 @@ const MainPage = ({ width }) => {
   const [state, setState] = React.useState({
     openDevicesList: false
   });
+  const loading = useSelector(state => state.fires.loading);
 
   const anchor = isWidthUp('sm', width) ? 'left' : 'bottom';
 
@@ -71,6 +79,9 @@ const MainPage = ({ width }) => {
   
   return (
     <div className={classes.root}>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <MainToolbar />
       <div className={classes.content}>
         <Fab size="small" color="primary" aria-label="add" onClick={toggleDevicesList(true)} style={fabStyle}>
