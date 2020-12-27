@@ -69,7 +69,7 @@ export class SwitcherControl {
           return;
         }
 
-        if (styleId === 'mapWinds' || styleId === 'mapTemperatures') {
+        if (styleId === 'mapWinds' || styleId === 'mapTemperatures' || styleId === 'mapRainThunder') {
           // Windy map
           document.getElementById('windy').style.visibility = 'visible';
           document.getElementById('mapbox').style.visibility = 'hidden';

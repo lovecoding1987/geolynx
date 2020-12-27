@@ -45,6 +45,7 @@ mapView.addControl(new SwitcherControl(
     { id: 'mapMapboxDemo', title: t('demo'), uri: styleMapbox('ckhl25qo906em19mcaj1x2evp') },
     { id: 'mapWinds', title: t('winds'), uri: '' },
     { id: 'mapTemperatures', title: t('temperatures'), uri: '' },
+    { id: 'mapRainThunder', title: t('rain_thunder'), uri: '' },
     {
       id: 'mapFIRMS',
       title: t('hot_spots'),

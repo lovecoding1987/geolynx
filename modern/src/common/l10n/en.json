@@ -278,6 +278,7 @@
     "weather": "Weather",
     "winds": "Winds",
     "temperatures": "Temperatures",
+    "rain_thunder": "Rain, thunder",
     "hot_spots": "Hot spots",
     "VIIRS": "VIIRS",
     "Modis": "Modis",

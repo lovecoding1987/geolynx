@@ -24,6 +24,8 @@ windyInit({
             store.set('overlay', 'wind');
         } else if (styleId === 'mapTemperatures') {
             store.set('overlay', 'temp');
+        } else if (styleId === 'mapRainThunder') {
+            store.set('overlay', 'rain');
         }
     }
     
