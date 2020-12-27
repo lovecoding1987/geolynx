@@ -20,32 +20,36 @@ const fireIconTemplate = (color) => {
 
 const createFeature = (record) => {
     const datetime = new Date(`${record.acq_date} ${record.acq_time.substring(0, 2)}:${record.acq_time.substring(2)}:00`);
-    const timediff = parseInt((new Date() - datetime) / 1000 / 60 / 60); 
+
+    if (datetime instanceof Date && !isNaN(datetime)) {
+
+        const timediff = parseInt((new Date() - datetime) / 1000 / 60 / 60); 
 
 
-    const color = record.old ? colorByMonth(datetime.getMonth() + 1) : colorByHoursDiff(timediff);
+        const color = record.old ? colorByMonth(datetime.getMonth() + 1) : colorByHoursDiff(timediff);
+        
+        const colorRgb = hexRgb(color);
+        const svg = fireIconTemplate(color);
     
-    const colorRgb = hexRgb(color);
-    const svg = fireIconTemplate(color);
-
-    return {
-        type: 'Feature',
-        geometry: {
-            type: 'Point',
-            coordinates: [parseFloat(record.longitude), parseFloat(record.latitude)]
-        },
-        properties: {
-            fire: true,
-            type: record.type,
-            description: `<strong>${record.type}</strong><br/>Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}`,
-            description1: `${record.type}, Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}`,
-            color: color,
-            colorR: colorRgb.red,
-            colorG: colorRgb.green,
-            colorB: colorRgb.blue,
-            icon: 'data:image/svg+xml;charset=UTF-8;base64,' + btoa(svg)
-        }
-    };
+        return {
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: [parseFloat(record.longitude), parseFloat(record.latitude)]
+            },
+            properties: {
+                fire: true,
+                type: record.type,
+                description: `<strong>${record.type}</strong><br/>Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}<br/>Confidence: ${record.confidence}`,
+                description1: `${record.type}, Date: ${datetime.getDate()}-${datetime.getMonth() + 1}-${datetime.getFullYear()}, Time: ${datetime.getHours()}:${datetime.getMinutes()}, Confidence: ${record.confidence}`,
+                color: color,
+                colorR: colorRgb.red,
+                colorG: colorRgb.green,
+                colorB: colorRgb.blue,
+                icon: 'data:image/svg+xml;charset=UTF-8;base64,' + btoa(svg)
+            }
+        };
+    }
 }
 
 const popup = new mapboxgl.Popup({
@@ -212,7 +216,8 @@ const FiresMap = () => {
                     const records = data[time];
                     if (records && records.length > 0) {
                         records.forEach(record => {
-                            features.push(createFeature(record));
+                            const feature = createFeature(record);
+                            if (feature) features.push(feature);
                         })
                     }
                 }
@@ -311,6 +316,10 @@ const FiresMap = () => {
         };
 
         document.getElementById('firms-search').addEventListener('click', onClickSearch);
+
+        return () => {
+            document.getElementById('firms-search').removeEventListener('click', onClickSearch);
+        }
     });
 
     return null;

@@ -27,7 +27,7 @@ export const fetchFIRMS = (id, time) => {
     })
 }
 
-export const fetchOldFIRMS = (country, year) => {
+export const fetchOldFIRMS = (country, year) => {console.log('fetchOldFIRMS..............')
     const url = `/firms/${year}/modis_${year}_${country}.csv`;
     
     return new Promise((resolve, reject) => {

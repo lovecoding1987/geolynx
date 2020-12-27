@@ -138,23 +138,24 @@ export class SwitcherControl {
       checkboxesDiv.style.padding = '5px';
 
       for (const c of style.checkboxes) {
-        const checkboxSpan = document.createElement('span');
+        const radioSpan = document.createElement('span');
 
-        const checkbox = document.createElement('input');
-        checkbox.classList.add(c.id);
-        checkbox.type = 'checkbox';
-        checkbox.innerText = c.title;
-        checkbox.dataset.id = c.id;
-        checkboxSpan.appendChild(checkbox);
+        const radio = document.createElement('input');
+        radio.classList.add(c.id);
+        radio.type = 'radio';
+        radio.name = 'fireType';
+        radio.innerText = c.title;
+        radio.dataset.id = c.id;
+        radioSpan.appendChild(radio);
 
         const label = document.createElement('label');
         label.for = c.id;
         label.innerText = c.title;
-        checkboxSpan.appendChild(label);
+        radioSpan.appendChild(label);
 
-        checkboxesDiv.appendChild(checkboxSpan);
+        checkboxesDiv.appendChild(radioSpan);
 
-        checkbox.addEventListener('change', event => {
+        radio.addEventListener('change', event => {
           const dataId = event.target.dataset.id;
           const checked = event.target.checked;
 
