@@ -155,23 +155,11 @@ export class SwitcherControl {
 
         checkboxesDiv.appendChild(radioSpan);
 
-        radio.addEventListener('change', event => {
+        radio.addEventListener('change', event => {console.log(event.target.checked)
           const dataId = event.target.dataset.id;
           const checked = event.target.checked;
 
-          if (dataId === 'mapFIRMS-old') {
-            document.getElementById('firms-filter-div').style.display = checked ? 'block' : 'none';
-            document.getElementsByClassName('mapFIRMS-24h')[0].disabled = checked;
-            document.getElementsByClassName('mapFIRMS-48h')[0].disabled = checked;
-            document.getElementsByClassName('mapFIRMS-7d')[0].disabled = checked;
-
-            document.dispatchEvent(new CustomEvent('enableFireSelection', {
-              detail: {
-                enable: !checked
-              }
-            }))
-          }
-          
+          document.getElementById('firms-filter-div').style.display = dataId === 'mapFIRMS-old' ? 'block' : 'none';
           document.dispatchEvent(new CustomEvent('changeFireSelection', {
             detail: {
               time: dataId.replace('mapFIRMS-', '_'),

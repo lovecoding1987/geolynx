@@ -102,7 +102,7 @@ const FiresMap = () => {
 
     const dispatch = useDispatch();
     const data = useSelector(state => state.fires.data);
-    const times = useSelector(state => state.fires.times);
+    const time = useSelector(state => state.fires.time);
 
     // Initialize sources and layers
     useEffect(() => {
@@ -211,9 +211,9 @@ const FiresMap = () => {
 
         const getFeatures = () => {
             const features = [];
-            Object.keys(data).forEach((time) => {
-                if (times.indexOf(time) > -1) {
-                    const records = data[time];
+            Object.keys(data).forEach((t) => {
+                if (time == t) {
+                    const records = data[t];
                     if (records && records.length > 0) {
                         records.forEach(record => {
                             const feature = createFeature(record);
@@ -264,43 +264,25 @@ const FiresMap = () => {
                 clearInterval(interval);
             }
         }, 100)
-    }, [data, times]);
+    }, [data, time]);
 
     useEffect(() => {
-        const onChangeFireSelection = async (e) => {
+        const onChangeFireSelection = async (e) => {console.log(e.detail)
             const { time, checked } = e.detail;
-
-            if (checked) {
-                dispatch(firesActions.selectTime(time));
-                if (time !== '_old') {
-                    dispatch(firesActions.setLoading(true));
-                    const promises = FIRMS_CATEGORIES.map(category => fetchFIRMS(category, time));
-                    const items = await Promise.all(promises);
-                    dispatch(firesActions.updateData({ time, items: [].concat(...items) }));
-                    dispatch(firesActions.setLoading(false));
-                }
-            } else {
-                dispatch(firesActions.deselectTime(time));
+            
+            dispatch(firesActions.selectTime(time));
+            if (time !== '_old') {
+                dispatch(firesActions.setLoading(true));
+                const promises = FIRMS_CATEGORIES.map(category => fetchFIRMS(category, time));
+                const items = await Promise.all(promises);
+                dispatch(firesActions.updateData({ time, items: [].concat(...items) }));
+                dispatch(firesActions.setLoading(false));
             }
         }
         document.addEventListener('changeFireSelection', onChangeFireSelection);
 
-        const onEnableFireSelection = async (e) => {
-            const { enable } = e.detail;
-
-            if (enable) {
-                if (document.getElementsByClassName('mapFIRMS-24h')[0].checked) dispatch(firesActions.selectTime('_24h'));
-                if (document.getElementsByClassName('mapFIRMS-48h')[0].checked) dispatch(firesActions.selectTime('_48h'));
-                if (document.getElementsByClassName('mapFIRMS-7d')[0].checked) dispatch(firesActions.selectTime('_7d'));
-            } else {
-                dispatch(firesActions.deselectAllTimes());
-            }
-        }
-        document.addEventListener('enableFireSelection', onEnableFireSelection);
-
         return () => {
             document.removeEventListener('changeFireSelection', onChangeFireSelection);
-            document.removeEventListener('enableFireSelection', onEnableFireSelection);
         }
     });
 
