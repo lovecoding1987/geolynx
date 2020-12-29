@@ -155,7 +155,7 @@ export class SwitcherControl {
 
         checkboxesDiv.appendChild(radioSpan);
 
-        radio.addEventListener('change', event => {console.log(event.target.checked)
+        radio.addEventListener('change', event => {
           const dataId = event.target.dataset.id;
           const checked = event.target.checked;
 

@@ -267,7 +267,7 @@ const FiresMap = () => {
     }, [data, time]);
 
     useEffect(() => {
-        const onChangeFireSelection = async (e) => {console.log(e.detail)
+        const onChangeFireSelection = async (e) => {
             const { time, checked } = e.detail;
             
             dispatch(firesActions.selectTime(time));
