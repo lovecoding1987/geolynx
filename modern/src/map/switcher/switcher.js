@@ -188,7 +188,7 @@ export class SwitcherControl {
       const typeSelect = document.createElement('select');
       typeSelect.name = 'firms_type';
       typeSelect.style.float = 'right';
-      ['hotspot', 'burned'].forEach((t1) => {
+      ['hot_spots', 'burned_area'].forEach((t1) => {
         const option = document.createElement('option');
         option.value = t1;
         option.innerText = t(t1);

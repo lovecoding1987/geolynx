@@ -8,8 +8,8 @@ const { reducer, actions } = createSlice({
             _24h: {},
             _48h: {},
             _7d: {},
-            _old_burn: {},
-            _old_burned: []
+            _old_hot_spots: {},
+            _old_burned_area: []
         },
         time: '',
         loading: false

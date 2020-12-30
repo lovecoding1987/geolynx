@@ -243,7 +243,7 @@ const FiresMap = () => {
         const getFeatures = () => {
             const features = [];
             Object.keys(data).forEach((t) => {
-                if (time !== '_old_burned' && time == t) {
+                if (time !== '_old_burned_area' && time == t) {
                     const records = data[t];
                     if (records && records.length > 0) {
                         records.forEach(record => {
@@ -293,7 +293,7 @@ const FiresMap = () => {
     useEffect(() => {
         const mapboxMap = mapView.mapboxMap;
 
-        const features = time == '_old_burned' ? data[time] : [];
+        const features = time == '_old_burned_area' ? data[time] : [];
 
         if (mapboxMap.getSource('burned')) {
             mapboxMap.getSource('burned').setData({
@@ -306,7 +306,7 @@ const FiresMap = () => {
             if (mapView.googleMap) {
                 const map = mapView.googleMap;
 
-                if (time == '_old_burned') {
+                if (time == '_old_burned_area') {
                     features.forEach(feature => {
                         const paths = [];
                         const len = feature.geometry.coordinates[0][0].length;
@@ -366,14 +366,14 @@ const FiresMap = () => {
 
             try {
                 dispatch(firesActions.setLoading(true));
-                if (type === 'hotspot') {
-                    dispatch(firesActions.selectTime('_old_hotspot'));
+                if (type === 'hot_spots') {
+                    dispatch(firesActions.selectTime('_old_hot_spots'));
                     const data = await fetchOldFIRMS(country, year);
-                    dispatch(firesActions.updateData({ time: '_old_hotspot', items: data }));
-                } else if (type === 'burned') {
-                    dispatch(firesActions.selectTime('_old_burned'));
+                    dispatch(firesActions.updateData({ time: '_old_hot_spots', items: data }));
+                } else if (type === 'burned_area') {
+                    dispatch(firesActions.selectTime('_old_burned_area'));
                     const data = await fetchBurnedData(country, year, 'Nov');
-                    dispatch(firesActions.updateData({ time: '_old_burned', items: data }));
+                    dispatch(firesActions.updateData({ time: '_old_burned_area', items: data }));
                 }
             } finally {
                 dispatch(firesActions.setLoading(false));
