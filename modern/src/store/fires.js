@@ -8,8 +8,10 @@ const { reducer, actions } = createSlice({
             _24h: {},
             _48h: {},
             _7d: {},
+            _old_burn: {},
+            _old_burned: []
         },
-        time: null,
+        time: '',
         loading: false
     },
     reducers: {
@@ -22,6 +24,10 @@ const { reducer, actions } = createSlice({
         selectTime(state, action) {
             const time = action.payload;
             state.time = time
+        },
+        deselectTime(state, action) {
+            const time = action.payload;
+            state.time = null;
         },
         setLoading(state, action) {
             state.loading = action.payload;            

@@ -138,28 +138,31 @@ export class SwitcherControl {
       checkboxesDiv.style.padding = '5px';
 
       for (const c of style.checkboxes) {
-        const radioSpan = document.createElement('span');
+        const checkboxSpan = document.createElement('span');
 
-        const radio = document.createElement('input');
-        radio.classList.add(c.id);
-        radio.type = 'radio';
-        radio.name = 'fireType';
-        radio.innerText = c.title;
-        radio.dataset.id = c.id;
-        radioSpan.appendChild(radio);
+        const checkbox = document.createElement('input');
+        checkbox.classList.add('fire-checkbox');
+        checkbox.type = 'checkbox';
+        checkbox.id = c.id;
+        checkbox.innerText = c.title;
+        checkbox.dataset.id = c.id;
+        checkboxSpan.appendChild(checkbox);
 
         const label = document.createElement('label');
         label.for = c.id;
         label.innerText = c.title;
-        radioSpan.appendChild(label);
+        checkboxSpan.appendChild(label);
 
-        checkboxesDiv.appendChild(radioSpan);
+        checkboxesDiv.appendChild(checkboxSpan);
 
-        radio.addEventListener('change', event => {
+        checkbox.addEventListener('change', event => {
+          for (let c1 of container.getElementsByClassName('fire-checkbox')) {
+            if (c1 !== event.target) c1.checked = false
+          }
           const dataId = event.target.dataset.id;
           const checked = event.target.checked;
 
-          document.getElementById('firms-filter-div').style.display = dataId === 'mapFIRMS-old' ? 'block' : 'none';
+          document.getElementById('firms-filter-div').style.display = document.getElementById('mapFIRMS-old').checked ? 'block' : 'none';
           document.dispatchEvent(new CustomEvent('changeFireSelection', {
             detail: {
               time: dataId.replace('mapFIRMS-', '_'),
@@ -176,6 +179,23 @@ export class SwitcherControl {
       firmsFilterDiv.id = 'firms-filter-div';
       firmsFilterDiv.style.padding = '5px';
       firmsFilterDiv.style.display = 'none';
+
+      const typeDiv = document.createElement('div');
+      typeDiv.classList.add('inner');
+      const typeLabel = document.createElement('label');
+      typeLabel.innerText = `${t('type')}:`;
+      typeDiv.appendChild(typeLabel);
+      const typeSelect = document.createElement('select');
+      typeSelect.name = 'firms_type';
+      typeSelect.style.float = 'right';
+      ['hotspot', 'burned'].forEach((t1) => {
+        const option = document.createElement('option');
+        option.value = t1;
+        option.innerText = t(t1);
+        typeSelect.appendChild(option);
+      })
+      typeDiv.appendChild(typeSelect);
+      firmsFilterDiv.appendChild(typeDiv);
 
       const countryDiv = document.createElement('div');
       countryDiv.classList.add('inner');

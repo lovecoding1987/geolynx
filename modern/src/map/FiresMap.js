@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import { useSelector, useDispatch } from 'react-redux';
 import hexRgb from 'hex-rgb';
 import { mapView } from './Map';
-import { fetchFIRMS, fetchOldFIRMS } from './FetchFIRMS';
+import { fetchBurnedData, fetchFIRMS, fetchOldFIRMS } from './FetchFIRMS';
 import { firesActions } from '../store';
 
 import { FIRMS_CATEGORIES } from '../common/constants';
@@ -23,14 +23,14 @@ const createFeature = (record) => {
 
     if (datetime instanceof Date && !isNaN(datetime)) {
 
-        const timediff = parseInt((new Date() - datetime) / 1000 / 60 / 60); 
+        const timediff = parseInt((new Date() - datetime) / 1000 / 60 / 60);
 
 
         const color = record.old ? colorByMonth(datetime.getMonth() + 1) : colorByHoursDiff(timediff);
-        
+
         const colorRgb = hexRgb(color);
         const svg = fireIconTemplate(color);
-    
+
         return {
             type: 'Feature',
             geometry: {
@@ -63,12 +63,15 @@ const onMapboxMouseEnter = (e) => {
 
     const feature = e.features[0];
 
-    const coordinates = feature.geometry.coordinates.slice();
-    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+    let html;
+    if (feature.layer.id === 'fires') {
+        html = feature.properties.description;
+    } else if (feature.layer.id === 'clusters') {
+        html = `<label>MODIS: </label><span>${feature.properties['MODIS']}</span><br/><label>VIIRS-S-NPP: </label><span>${feature.properties['VIIRS-S-NPP']}</span><br/><label>VIIRS-NOAA-20: </label><span>${feature.properties['VIIRS-NOAA-20']}</span>`;
+    } else if (feature.layer.id === 'burned') {
+        html = `Burned date: ${feature.properties['BurnDate']}`
     }
-    const html = feature.layer.id === 'fires' ? feature.properties.description : `<label>MODIS: </label><span>${feature.properties['MODIS']}</span><br/><label>VIIRS-S-NPP: </label><span>${feature.properties['VIIRS-S-NPP']}</span><br/><label>VIIRS-NOAA-20: </label><span>${feature.properties['VIIRS-NOAA-20']}</span>`;
-    popup.setLngLat(coordinates).setHTML(html).addTo(map);
+    popup.setLngLat(e.lngLat).setHTML(html).addTo(map);
 }
 
 const onMapboxMouseLeave = () => {
@@ -185,18 +188,46 @@ const FiresMap = () => {
             });
         }
 
+        if (!mapboxMap.getSource('burned')) {
+            mapboxMap.addSource('burned', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: [],
+                },
+            });
+        }
+
+        if (!mapboxMap.getLayer('burned')) {
+            mapboxMap.addLayer({
+                id: 'burned',
+                type: 'fill',
+                source: 'burned',
+                'paint': {
+                    'fill-color': '#ff0000',
+                    'fill-opacity': 0.8
+                }
+            });
+        }
+
         mapboxMap.on('mouseenter', 'fires', onMapboxMouseEnter);
         mapboxMap.on('mouseenter', 'clusters', onMapboxMouseEnter);
+        mapboxMap.on('mouseenter', 'burned', onMapboxMouseEnter);
         mapboxMap.on('mouseleave', 'fires', onMapboxMouseLeave);
         mapboxMap.on('mouseleave', 'clusters', onMapboxMouseLeave);
+        mapboxMap.on('mouseleave', 'burned', onMapboxMouseLeave);
+
         mapboxMap.on('click', 'clusters', onMapboxClick);
 
 
         return () => {
             mapboxMap.off('mouseenter', 'fires', onMapboxMouseEnter);
             mapboxMap.off('mouseenter', 'clusters', onMapboxMouseEnter);
+            mapboxMap.off('mouseenter', 'burned', onMapboxMouseEnter);
             mapboxMap.off('mouseleave', 'fires', onMapboxMouseLeave);
             mapboxMap.off('mouseleave', 'clusters', onMapboxMouseLeave);
+            mapboxMap.off('mouseleave', 'burned', onMapboxMouseLeave);
+
             mapboxMap.off('click', 'clusters', onMapboxClick);
             if (mapboxMap.getLayer('cluster-count')) mapboxMap.removeLayer('cluster-count');
             if (mapboxMap.getLayer('clusters')) mapboxMap.removeLayer('clusters');
@@ -205,14 +236,14 @@ const FiresMap = () => {
         };
     }, []);
 
-    // Set feature data
+    // Set feature data for fire dots
     useEffect(() => {
         const mapboxMap = mapView.mapboxMap;
 
         const getFeatures = () => {
             const features = [];
             Object.keys(data).forEach((t) => {
-                if (time == t) {
+                if (time !== '_old_burned' && time == t) {
                     const records = data[t];
                     if (records && records.length > 0) {
                         records.forEach(record => {
@@ -239,13 +270,6 @@ const FiresMap = () => {
             if (mapView.googleMap) {
                 const map = mapView.googleMap;
 
-                // map.data.forEach((feature) => { if (feature.getProperty('fire')) map.data.remove(feature) });
-
-                // map.data.addGeoJson({
-                //     type: 'FeatureCollection',
-                //     features: features
-                // });
-
                 if (googleMarkerCluster) googleMarkerCluster.clearMarkers();
                 const markers = features.map(feature => (
                     new window.google.maps.Marker({
@@ -267,16 +291,64 @@ const FiresMap = () => {
     }, [data, time]);
 
     useEffect(() => {
+        const mapboxMap = mapView.mapboxMap;
+
+        const features = time == '_old_burned' ? data[time] : [];
+
+        if (mapboxMap.getSource('burned')) {
+            mapboxMap.getSource('burned').setData({
+                type: 'FeatureCollection',
+                features: features
+            });
+        }
+
+        const interval = setInterval(() => {
+            if (mapView.googleMap) {
+                const map = mapView.googleMap;
+
+                if (time == '_old_burned') {
+                    features.forEach(feature => {
+                        const paths = [];
+                        const len = feature.geometry.coordinates[0][0].length;
+                        for (let i = 0; i < len; i++) {
+                            const pt = new window.google.maps.LatLng(feature.geometry.coordinates[0][0][i][1], feature.geometry.coordinates[0][0][i][0]);
+                            paths.push(pt);
+                        }
+                        paths.push(new window.google.maps.LatLng(feature.geometry.coordinates[0][0][0][1], feature.geometry.coordinates[0][0][0][0]))
+                        
+                        const polyline = new window.google.maps.Polygon({
+                            paths: paths,
+                            strokeColor: '#FF0000',
+                            strokeWeight: 2,
+                            strokeOpacity: 1,
+                            fillColor: '#FF0000',
+                            fillOpacity: 0.35
+                        });
+    
+                        polyline.setMap(map);
+                    })
+                }
+
+                clearInterval(interval);
+            }
+        }, 100)
+    }, [data, time])
+
+    useEffect(() => {
         const onChangeFireSelection = async (e) => {
             const { time, checked } = e.detail;
-            
-            dispatch(firesActions.selectTime(time));
-            if (time !== '_old') {
-                dispatch(firesActions.setLoading(true));
-                const promises = FIRMS_CATEGORIES.map(category => fetchFIRMS(category, time));
-                const items = await Promise.all(promises);
-                dispatch(firesActions.updateData({ time, items: [].concat(...items) }));
-                dispatch(firesActions.setLoading(false));
+
+            if (checked) {
+                if (time !== '_old') {
+                    dispatch(firesActions.selectTime(time));
+                    dispatch(firesActions.setLoading(true));
+                    const promises = FIRMS_CATEGORIES.map(category => fetchFIRMS(category, time));
+                    const items = await Promise.all(promises);
+                    dispatch(firesActions.updateData({ time, items: [].concat(...items) }));
+                    dispatch(firesActions.setLoading(false));
+                }
+            } else {
+                dispatch(firesActions.deselectTime())
             }
         }
         document.addEventListener('changeFireSelection', onChangeFireSelection);
@@ -288,13 +360,24 @@ const FiresMap = () => {
 
     useEffect(() => {
         const onClickSearch = async () => {
+            const type = document.getElementsByName('firms_type')[0].value;
             const country = document.getElementsByName('firms_country')[0].value;
             const year = document.getElementsByName('firms_year')[0].value;
 
-            dispatch(firesActions.setLoading(true));
-            const records = await fetchOldFIRMS(country, year);
-            dispatch(firesActions.updateData({ time: '_old', items: records }));
-            dispatch(firesActions.setLoading(false));
+            try {
+                dispatch(firesActions.setLoading(true));
+                if (type === 'hotspot') {
+                    dispatch(firesActions.selectTime('_old_hotspot'));
+                    const data = await fetchOldFIRMS(country, year);
+                    dispatch(firesActions.updateData({ time: '_old_hotspot', items: data }));
+                } else if (type === 'burned') {
+                    dispatch(firesActions.selectTime('_old_burned'));
+                    const data = await fetchBurnedData(country, year, 'Nov');
+                    dispatch(firesActions.updateData({ time: '_old_burned', items: data }));
+                }
+            } finally {
+                dispatch(firesActions.setLoading(false));
+            }
         };
 
         document.getElementById('firms-search').addEventListener('click', onClickSearch);

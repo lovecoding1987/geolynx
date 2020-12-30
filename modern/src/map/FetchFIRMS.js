@@ -27,8 +27,8 @@ export const fetchFIRMS = (id, time) => {
     })
 }
 
-export const fetchOldFIRMS = (country, year) => {console.log('fetchOldFIRMS..............')
-    const url = `/firms/${year}/modis_${year}_${country}.csv`;
+export const fetchOldFIRMS = (country, year) => {
+    const url = `/firms/burn/${year}/modis_${year}_${country}.csv`;
     
     return new Promise((resolve, reject) => {
         return fetch(url).then((res) => res.text().then((data) => csv_parse(data.trim(), {
@@ -40,4 +40,10 @@ export const fetchOldFIRMS = (country, year) => {console.log('fetchOldFIRMS.....
             return resolve(records.map(r => ({...r, type: 'modis', old: true})));
         })))
     })
+}
+
+export const fetchBurnedData = (country, year, month) => {
+    const url = `/firms/burned/${country}/${year}/${country}_${year}_${month}.geojson`;
+
+    return new Promise((resolve, reject) => fetch(url).then(res => res.json().then(data => resolve(data.features))).catch(e => reject(e)))
 }
