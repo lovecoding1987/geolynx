@@ -1,0 +1,44 @@
+#firms-filter-control-container.mapboxgl-ctrl-top-right {
+    top: 40px;
+}
+
+.mapboxgl-filter-container
+{
+  display: none;
+}
+.mapboxgl-ctrl-group
+{
+  margin: 10px;
+}
+.mapboxgl-ctrl-group .mapboxgl-filter-container > div
+{
+  background: none;
+  border: none;
+  display: block;
+  font-size: 14px;
+  padding: 8px 8px 6px;
+  text-align: left;
+  width: 100%;
+  height: auto;
+}
+.mapboxgl-ctrl-group .mapboxgl-filter-container div.inner {
+  line-height: 30px;
+}
+.mapboxgl-ctrl-group .mapboxgl-filter-container div.inner input,
+.mapboxgl-ctrl-group .mapboxgl-filter-container div.inner select {
+  width: 150px;
+  height: 24px;
+}
+
+
+.mapboxgl-filter-container > button + button
+{
+  border-top: 1px solid #ddd;
+}
+
+.mapboxgl-filter-container button.search {
+  width: auto !important;
+  float: right;
+    margin: 5px 0px;
+    padding: 5px 10px;
+}

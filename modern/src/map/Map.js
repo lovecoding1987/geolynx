@@ -1,12 +1,12 @@
 import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
 
 import { SwitcherControl } from './switcher/switcher';
-import './switcher/switcher.css';
 import { styleMapbox, styleOsm } from './mapStyles';
 import t from '../common/localization';
 import DrawPopover from './DrawPopover';
 import MapView, { initMapboxMap } from './MapView';
 import { loadSymbolImage } from './mapUtil';
+import { FirmsFilter } from './switcher/firms-filter';
 
 export const mapView = new MapView();
 
@@ -54,14 +54,8 @@ mapView.addControl(new SwitcherControl(
         { id: 'mapFIRMS-24h', title: `24 ${t('hrs')}` },
         { id: 'mapFIRMS-48h', title: `48 ${t('hrs')}` },
         { id: 'mapFIRMS-7d', title: `7 ${t('days')}` },
-        { id: 'mapFIRMS-old', title: t('old') },
       ]
-    },
-    {
-      id: 'mapBurnedAreas',
-      title: t('burned_areas')  
     }
-
   ],
   'mapOsm',
   (styleId) => {
@@ -81,6 +75,8 @@ mapView.addControl(new SwitcherControl(
     }, 300)
   },
 ));
+
+mapView.addControl(new FirmsFilter());
 
 const Map = ({ children, mapStyle }) => {
   const containerEl = useRef(null);

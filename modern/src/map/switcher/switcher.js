@@ -1,8 +1,8 @@
 import mapboxgl from 'mapbox-gl';
+import './switcher.css';
 import config from '../../config';
 import countries from '../../common/countries';
 import t from '../../common/localization';
-import csv_parse from 'csv-parse';
 
 
 export class SwitcherControl {
@@ -162,7 +162,6 @@ export class SwitcherControl {
           const dataId = event.target.dataset.id;
           const checked = event.target.checked;
 
-          document.getElementById('firms-filter-div').style.display = document.getElementById('mapFIRMS-old').checked ? 'block' : 'none';
           document.dispatchEvent(new CustomEvent('changeFireSelection', {
             detail: {
               time: dataId.replace('mapFIRMS-', '_'),
@@ -172,164 +171,13 @@ export class SwitcherControl {
         });
       }
       container.appendChild(checkboxesDiv);
-
-
-      // Add filters for searching FIRMS
-      const firmsFilterDiv = document.createElement('div');
-      firmsFilterDiv.id = 'firms-filter-div';
-      firmsFilterDiv.style.padding = '5px';
-      firmsFilterDiv.style.height = '185px';
-      firmsFilterDiv.style.display = 'none';
-
-      const countryDiv = document.createElement('div');
-      countryDiv.classList.add('inner');
-      const countryLabel = document.createElement('label');
-      countryLabel.innerText = `${t('country')}:`;
-      countryDiv.appendChild(countryLabel);
-      const countrySelect = document.createElement('select');
-      countrySelect.name = 'hotspots_country';
-      countrySelect.style.float = 'right';
-      countries.forEach((country) => {
-        const option = document.createElement('option');
-        option.value = country.name;
-        option.innerText = country.name;
-        countrySelect.appendChild(option);
-      })
-      countryDiv.appendChild(countrySelect);
-      firmsFilterDiv.appendChild(countryDiv);
-
-      const today = new Date();
-      const yearDiv = document.createElement('div');
-      yearDiv.classList.add('inner');
-      const yearLabel = document.createElement('label');
-      yearLabel.innerText = `${t('year')}:`;
-      yearDiv.appendChild(yearLabel);
-      const yearSelect = document.createElement('select');
-      yearSelect.name = 'hotspots_year';
-      yearSelect.style.float = 'right';
-      Array(today.getFullYear() - 2000 + 1).fill().map((v, i) => i + 2000).forEach((year) => {
-        const option = document.createElement('option');
-        option.value = year;
-        option.innerText = year;
-        yearSelect.appendChild(option);
-      })
-      yearDiv.appendChild(yearSelect);
-      firmsFilterDiv.appendChild(yearDiv);
       
-      const monthDiv = document.createElement('div');
-      monthDiv.classList.add('inner');
-      const monthLabel = document.createElement('label');
-      monthLabel.innerText = `${t('month')}:`;
-      monthDiv.appendChild(monthLabel);
-      const monthSelect = document.createElement('select');
-      monthSelect.name = 'hotspots_month';
-      monthSelect.multiple = true;
-      monthSelect.style.float = 'right';
-      monthSelect.style.height = '100px';
-      Array(12).fill().map((v, i) => i + 1).forEach((month) => {
-        const option = document.createElement('option');
-        option.value = month;
-        option.innerText = t(`months`)[month-1];
-        monthSelect.appendChild(option);
-      })
-      monthDiv.appendChild(monthSelect);
-      firmsFilterDiv.appendChild(monthDiv);
-      
-
-      const searchBtn = document.createElement('button');
-      searchBtn.id = 'hotspots-search';
-      searchBtn.innerHTML = `<span><i class="fa fa-search"></i>&nbsp;${t('search')}</span>`;
-      searchBtn.classList.add('search');
-
-      firmsFilterDiv.appendChild(searchBtn);
-
-      container.appendChild(firmsFilterDiv);
-      me.mapStyleContainer.appendChild(container);
-    }
-
-    const addStyleItemBurnedAreas = (style) => {
-      const container = document.createElement('div');
-      container.innerText = style.title;
-      container.classList.add(style.id);
-
-      // Add filters for searching FIRMS
-      const firmsFilterDiv = document.createElement('div');
-      firmsFilterDiv.id = 'burned-areas-filter-div';
-      firmsFilterDiv.style.padding = '5px';
-      firmsFilterDiv.style.height = '185px';
-      firmsFilterDiv.style.display = 'block';
-
-      const countryDiv = document.createElement('div');
-      countryDiv.classList.add('inner');
-      const countryLabel = document.createElement('label');
-      countryLabel.innerText = `${t('country')}:`;
-      countryDiv.appendChild(countryLabel);
-      const countrySelect = document.createElement('select');
-      countrySelect.name = 'burned_country';
-      countrySelect.style.float = 'right';
-      countries.forEach((country) => {
-        const option = document.createElement('option');
-        option.value = country.name;
-        option.innerText = country.name;
-        countrySelect.appendChild(option);
-      })
-      countryDiv.appendChild(countrySelect);
-      firmsFilterDiv.appendChild(countryDiv);
-
-      const today = new Date();
-      const yearDiv = document.createElement('div');
-      yearDiv.classList.add('inner');
-      const yearLabel = document.createElement('label');
-      yearLabel.innerText = `${t('year')}:`;
-      yearDiv.appendChild(yearLabel);
-      const yearSelect = document.createElement('select');
-      yearSelect.name = 'burned_year';
-      yearSelect.style.float = 'right';
-      Array(today.getFullYear() - 2000 + 1).fill().map((v, i) => i + 2000).forEach((year) => {
-        const option = document.createElement('option');
-        option.value = year;
-        option.innerText = year;
-        yearSelect.appendChild(option);
-      })
-      yearDiv.appendChild(yearSelect);
-      firmsFilterDiv.appendChild(yearDiv);
-      
-      const monthDiv = document.createElement('div');
-      monthDiv.classList.add('inner');
-      const monthLabel = document.createElement('label');
-      monthLabel.innerText = `${t('month')}:`;
-      monthDiv.appendChild(monthLabel);
-      const monthSelect = document.createElement('select');
-      monthSelect.name = 'burned_month';
-      monthSelect.multiple = true;
-      monthSelect.style.float = 'right';
-      monthSelect.style.height = '100px';
-      Array(12).fill().map((v, i) => i + 1).forEach((month) => {
-        const option = document.createElement('option');
-        option.value = month;
-        option.innerText = t(`months`)[month-1];
-        monthSelect.appendChild(option);
-      })
-      monthDiv.appendChild(monthSelect);
-      firmsFilterDiv.appendChild(monthDiv);
-      
-
-      const searchBtn = document.createElement('button');
-      searchBtn.id = 'burned-search';
-      searchBtn.innerHTML = `<span><i class="fa fa-search"></i>&nbsp;${t('search')}</span>`;
-      searchBtn.classList.add('search');
-
-      firmsFilterDiv.appendChild(searchBtn);
-
-      container.appendChild(firmsFilterDiv);
       me.mapStyleContainer.appendChild(container);
     }
 
     for (const style of me.styles) {
       if (style.id === 'mapHotSpots') {
         addStyleItemHotSpots(style);
-      } else if (style.id === 'mapBurnedAreas') {
-        addStyleItemBurnedAreas(style);
       } else {
         addStyleItemButton(style);
       }

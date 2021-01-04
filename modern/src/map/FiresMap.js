@@ -243,7 +243,7 @@ const FiresMap = () => {
         const getFeatures = () => {
             const features = [];
             Object.keys(data).forEach((t) => {
-                if (time !== '_old_burned_area' && time == t) {
+                if (time !== '_old_burned_areas' && time == t) {
                     const records = data[t];
                     if (records && records.length > 0) {
                         records.forEach(record => {
@@ -293,7 +293,7 @@ const FiresMap = () => {
     useEffect(() => {
         const mapboxMap = mapView.mapboxMap;
 
-        const features = time == '_old_burned_area' ? data[time] : [];
+        const features = time == '_old_burned_areas' ? data[time] : [];
 
         if (mapboxMap.getSource('burned')) {
             mapboxMap.getSource('burned').setData({
@@ -306,7 +306,7 @@ const FiresMap = () => {
             if (mapView.googleMap) {
                 const map = mapView.googleMap;
 
-                if (time == '_old_burned_area') {
+                if (time == '_old_burned_areas') {
                     features.forEach(feature => {
                         const paths = [];
                         const len = feature.geometry.coordinates[0][0].length;
@@ -360,50 +360,27 @@ const FiresMap = () => {
 
     useEffect(() => {
         const onClickSearch = async () => {
-            const country = document.getElementsByName('hotspots_country')[0].value;
-            const year = document.getElementsByName('hotspots_year')[0].value;
-            const months = [...document.getElementsByName('hotspots_month')[0].options].filter(option=>option.selected).map(option => option.text);
+            const type = document.getElementsByName('filter_type')[0].value;
+            const country = document.getElementsByName('filter_country')[0].value;
+            const year = document.getElementsByName('filter_year')[0].value;
+            const months = [...document.getElementsByName('filter_month')[0].options].filter(option=>option.selected).map(option => option.text);
 
             try {
-                dispatch(firesActions.setLoading(true));                
-                dispatch(firesActions.selectTime('_old_hot_spots'));
-                const promises = months.map(month => fetchOldFIRMS(country, year, month));
+                dispatch(firesActions.setLoading(true));     
+                dispatch(firesActions.selectTime(`_old_${type}`));
+
+                const promises = months.map(month => type === 'hot_spots' ? fetchOldFIRMS(country, year, month) : fetchBurnedData(country, year, month));
                 const data = await Promise.all(promises);
-                dispatch(firesActions.updateData({ time: '_old_hot_spots', items: [].concat(...data) }));
+                dispatch(firesActions.updateData({ time: `_old_${type}`, items: [].concat(...data) }));
             } finally {
                 dispatch(firesActions.setLoading(false));
             }
         };
 
-        document.getElementById('hotspots-search').addEventListener('click', onClickSearch);
+        document.getElementById('firms-search').addEventListener('click', onClickSearch);
 
         return () => {
-            document.getElementById('hotspots-search').removeEventListener('click', onClickSearch);
-        }
-    });
-
-    useEffect(() => {
-        const onClickSearch = async () => {
-            const country = document.getElementsByName('burned_country')[0].value;
-            const year = document.getElementsByName('burned_year')[0].value;
-            const months = [...document.getElementsByName('burned_month')[0].options].filter(option=>option.selected).map(option => option.text);
-
-            try {
-                dispatch(firesActions.setLoading(true));
-                
-                dispatch(firesActions.selectTime('_old_burned_area'));
-                const promises = months.map(month => fetchBurnedData(country, year, month));
-                const data = await Promise.all(promises);
-                dispatch(firesActions.updateData({ time: '_old_burned_area', items: [].concat(...data) }));
-            } finally {
-                dispatch(firesActions.setLoading(false));
-            }
-        };
-
-        document.getElementById('burned-search').addEventListener('click', onClickSearch);
-
-        return () => {
-            document.getElementById('burned-search').removeEventListener('click', onClickSearch);
+            document.getElementById('firms-search').removeEventListener('click', onClickSearch);
         }
     });
 
