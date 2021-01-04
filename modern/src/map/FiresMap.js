@@ -380,7 +380,7 @@ const FiresMap = () => {
         document.getElementById('firms-search').addEventListener('click', onClickSearch);
 
         return () => {
-            document.getElementById('firms-search').removeEventListener('click', onClickSearch);
+            if (document.getElementById('firms-search')) document.getElementById('firms-search').removeEventListener('click', onClickSearch);
         }
     });
 

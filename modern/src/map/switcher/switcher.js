@@ -1,8 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import './switcher.css';
 import config from '../../config';
-import countries from '../../common/countries';
-import t from '../../common/localization';
 
 
 export class SwitcherControl {
