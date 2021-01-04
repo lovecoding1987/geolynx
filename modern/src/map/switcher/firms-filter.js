@@ -1,3 +1,4 @@
+import { isMobile } from 'react-device-detect';
 import './firms-filter.css';
 import countries from '../../common/countries';
 import t from '../../common/localization';
@@ -110,7 +111,7 @@ export class FirmsFilter {
     monthSelect.name = 'filter_month';
     monthSelect.multiple = true;
     monthSelect.style.float = 'right';
-    monthSelect.style.height = '100px';
+    if (!isMobile) monthSelect.style.height = '210px';
     Array(12).fill().map((v, i) => i + 1).forEach((month) => {
       const option = document.createElement('option');
       option.value = month;
