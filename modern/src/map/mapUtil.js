@@ -236,18 +236,42 @@ export const mapDrawStyles = [
 
 export const colorByMonth = (month) => {
   switch (month) {
-    case 1: return '#800000';
-    case 2: return '#e6194b';
-    case 3: return '#f58230';
-    case 4: return '#ffe119';
-    case 5: return '#d2f53c';
-    case 6: return '#3cb44b';
-    case 7: return '#46f0f0';
-    case 8: return '#0082c8';
-    case 9: return '#911eb4';
-    case 10: return '#f032e6';
-    case 11: return '#808080';
-    case 12: return '#000000';
+    case 1:
+    case 'Jan':
+      return '#800000';
+    case 2:
+    case 'Feb':
+      return '#e6194b';
+    case 3:
+    case 'Mar':
+      return '#f58230';
+    case 4:
+    case 'Apr':
+      return '#ffe119';
+    case 5:
+    case 'May':
+      return '#d2f53c';
+    case 6:
+    case 'Jun':
+      return '#3cb44b';
+    case 7:
+    case 'Jul':
+      return '#46f0f0';
+    case 8:
+    case 'Aug':
+      return '#0082c8';
+    case 9:
+    case 'Sep':
+      return '#911eb4';
+    case 10:
+    case 'Oct':
+      return '#f032e6';
+    case 11:
+    case 'Nov':
+      return '#808080';
+    case 12:
+    case 'Dec':
+      return '#000000';
   }
 }
 

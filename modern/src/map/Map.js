@@ -47,16 +47,21 @@ mapView.addControl(new SwitcherControl(
     { id: 'mapTemperatures', title: t('temperatures'), uri: '' },
     { id: 'mapRainThunder', title: t('rain'), uri: '' },
     {
-      id: 'mapFIRMS',
+      id: 'mapHotSpots',
       title: t('hot_spots'),
-      uri: styleMapbox('ckhvoc3ym0grz19k72icogk47'),
+      uri: '',
       checkboxes: [
         { id: 'mapFIRMS-24h', title: `24 ${t('hrs')}` },
         { id: 'mapFIRMS-48h', title: `48 ${t('hrs')}` },
         { id: 'mapFIRMS-7d', title: `7 ${t('days')}` },
         { id: 'mapFIRMS-old', title: t('old') },
       ]
+    },
+    {
+      id: 'mapBurnedAreas',
+      title: t('burned_areas')  
     }
+
   ],
   'mapOsm',
   (styleId) => {

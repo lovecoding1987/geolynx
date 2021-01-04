@@ -204,8 +204,8 @@ const FiresMap = () => {
                 type: 'fill',
                 source: 'burned',
                 'paint': {
-                    'fill-color': '#ff0000',
-                    'fill-opacity': 0.8
+                    'fill-color': ['get', 'color'],
+                    'fill-opacity': 0.5
                 }
             });
         }
@@ -318,11 +318,11 @@ const FiresMap = () => {
                         
                         const polyline = new window.google.maps.Polygon({
                             paths: paths,
-                            strokeColor: '#FF0000',
+                            strokeColor: feature.properties.color,
                             strokeWeight: 2,
                             strokeOpacity: 1,
-                            fillColor: '#FF0000',
-                            fillOpacity: 0.35
+                            fillColor: feature.properties.color,
+                            fillOpacity: 0.5
                         });
     
                         polyline.setMap(map);
@@ -360,30 +360,50 @@ const FiresMap = () => {
 
     useEffect(() => {
         const onClickSearch = async () => {
-            const type = document.getElementsByName('firms_type')[0].value;
-            const country = document.getElementsByName('firms_country')[0].value;
-            const year = document.getElementsByName('firms_year')[0].value;
+            const country = document.getElementsByName('hotspots_country')[0].value;
+            const year = document.getElementsByName('hotspots_year')[0].value;
+            const months = [...document.getElementsByName('hotspots_month')[0].options].filter(option=>option.selected).map(option => option.text);
 
             try {
-                dispatch(firesActions.setLoading(true));
-                if (type === 'hot_spots') {
-                    dispatch(firesActions.selectTime('_old_hot_spots'));
-                    const data = await fetchOldFIRMS(country, year);
-                    dispatch(firesActions.updateData({ time: '_old_hot_spots', items: data }));
-                } else if (type === 'burned_area') {
-                    dispatch(firesActions.selectTime('_old_burned_area'));
-                    const data = await fetchBurnedData(country, year, 'Nov');
-                    dispatch(firesActions.updateData({ time: '_old_burned_area', items: data }));
-                }
+                dispatch(firesActions.setLoading(true));                
+                dispatch(firesActions.selectTime('_old_hot_spots'));
+                const promises = months.map(month => fetchOldFIRMS(country, year, month));
+                const data = await Promise.all(promises);
+                dispatch(firesActions.updateData({ time: '_old_hot_spots', items: [].concat(...data) }));
             } finally {
                 dispatch(firesActions.setLoading(false));
             }
         };
 
-        document.getElementById('firms-search').addEventListener('click', onClickSearch);
+        document.getElementById('hotspots-search').addEventListener('click', onClickSearch);
 
         return () => {
-            document.getElementById('firms-search').removeEventListener('click', onClickSearch);
+            document.getElementById('hotspots-search').removeEventListener('click', onClickSearch);
+        }
+    });
+
+    useEffect(() => {
+        const onClickSearch = async () => {
+            const country = document.getElementsByName('burned_country')[0].value;
+            const year = document.getElementsByName('burned_year')[0].value;
+            const months = [...document.getElementsByName('burned_month')[0].options].filter(option=>option.selected).map(option => option.text);
+
+            try {
+                dispatch(firesActions.setLoading(true));
+                
+                dispatch(firesActions.selectTime('_old_burned_area'));
+                const promises = months.map(month => fetchBurnedData(country, year, month));
+                const data = await Promise.all(promises);
+                dispatch(firesActions.updateData({ time: '_old_burned_area', items: [].concat(...data) }));
+            } finally {
+                dispatch(firesActions.setLoading(false));
+            }
+        };
+
+        document.getElementById('burned-search').addEventListener('click', onClickSearch);
+
+        return () => {
+            document.getElementById('burned-search').removeEventListener('click', onClickSearch);
         }
     });
 

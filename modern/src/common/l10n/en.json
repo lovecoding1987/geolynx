@@ -279,7 +279,7 @@
     "winds": "Winds",
     "temperatures": "Temperatures",
     "rain": "Rain",
-    "hot_spots": "Hot spots",
+    "hot_spots": "Hot spots(FIRMS)",
     "VIIRS": "VIIRS",
     "Modis": "Modis",
     "stateTitle": "State",
@@ -491,5 +491,7 @@
     "burned": "Burned",
     "burn": "Burn",
     "type": "Type",
-    "burned_area": "Burned area"
+    "burned_areas": "Burned Areas(FIRMS)",
+    "month": "Month",
+    "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 }

@@ -128,7 +128,7 @@ export class SwitcherControl {
       return container;
     }
 
-    const addStyleItemWithCheckboxes = (style) => {
+    const addStyleItemHotSpots = (style) => {
       const container = document.createElement('div');
       container.innerText = style.title;
       container.classList.add(style.id);
@@ -178,24 +178,8 @@ export class SwitcherControl {
       const firmsFilterDiv = document.createElement('div');
       firmsFilterDiv.id = 'firms-filter-div';
       firmsFilterDiv.style.padding = '5px';
+      firmsFilterDiv.style.height = '185px';
       firmsFilterDiv.style.display = 'none';
-
-      const typeDiv = document.createElement('div');
-      typeDiv.classList.add('inner');
-      const typeLabel = document.createElement('label');
-      typeLabel.innerText = `${t('type')}:`;
-      typeDiv.appendChild(typeLabel);
-      const typeSelect = document.createElement('select');
-      typeSelect.name = 'firms_type';
-      typeSelect.style.float = 'right';
-      ['hot_spots', 'burned_area'].forEach((t1) => {
-        const option = document.createElement('option');
-        option.value = t1;
-        option.innerText = t(t1);
-        typeSelect.appendChild(option);
-      })
-      typeDiv.appendChild(typeSelect);
-      firmsFilterDiv.appendChild(typeDiv);
 
       const countryDiv = document.createElement('div');
       countryDiv.classList.add('inner');
@@ -203,7 +187,7 @@ export class SwitcherControl {
       countryLabel.innerText = `${t('country')}:`;
       countryDiv.appendChild(countryLabel);
       const countrySelect = document.createElement('select');
-      countrySelect.name = 'firms_country';
+      countrySelect.name = 'hotspots_country';
       countrySelect.style.float = 'right';
       countries.forEach((country) => {
         const option = document.createElement('option');
@@ -221,7 +205,7 @@ export class SwitcherControl {
       yearLabel.innerText = `${t('year')}:`;
       yearDiv.appendChild(yearLabel);
       const yearSelect = document.createElement('select');
-      yearSelect.name = 'firms_year';
+      yearSelect.name = 'hotspots_year';
       yearSelect.style.float = 'right';
       Array(today.getFullYear() - 2000 + 1).fill().map((v, i) => i + 2000).forEach((year) => {
         const option = document.createElement('option');
@@ -231,56 +215,109 @@ export class SwitcherControl {
       })
       yearDiv.appendChild(yearSelect);
       firmsFilterDiv.appendChild(yearDiv);
-      /*const fromDiv = document.createElement('div');    
-      fromDiv.classList.add('inner');
-      const fromLabel = document.createElement('label');      
-      fromLabel.innerText = `${t('from')}:`;
-      fromDiv.appendChild(fromLabel);
-      const fromInput = document.createElement('input');
-      fromInput.name = 'firms_from';
-      fromInput.style.float = 'right';
-      fromInput.type = "month";
-      fromInput.min = '2000-01';
-      fromInput.max = today.getFullYear() + '-' + (today.getMonth()+1);
-      fromInput.value = '2000-01';
-      fromDiv.appendChild(fromInput);
-      firmsFilterDiv.appendChild(fromDiv);
-
-      const toDiv = document.createElement('div');    
-      toDiv.classList.add('inner');
-      const toLabel = document.createElement('label');      
-      toLabel.innerText = `${t('to')}:`;
-      toDiv.appendChild(toLabel);
-      const toInput = document.createElement('input');
-      toInput.name = 'firms_to';
-      toInput.style.float = 'right';
-      toInput.type = "month";
-      toInput.min = '2000-01';
-      toInput.max = today.getFullYear() + '-' + (today.getMonth()+1);
-      toInput.value = '2000-12';
-      toDiv.appendChild(toInput);
-      firmsFilterDiv.appendChild(toDiv);*/
+      
+      const monthDiv = document.createElement('div');
+      monthDiv.classList.add('inner');
+      const monthLabel = document.createElement('label');
+      monthLabel.innerText = `${t('month')}:`;
+      monthDiv.appendChild(monthLabel);
+      const monthSelect = document.createElement('select');
+      monthSelect.name = 'hotspots_month';
+      monthSelect.multiple = true;
+      monthSelect.style.float = 'right';
+      monthSelect.style.height = '100px';
+      Array(12).fill().map((v, i) => i + 1).forEach((month) => {
+        const option = document.createElement('option');
+        option.value = month;
+        option.innerText = t(`months`)[month-1];
+        monthSelect.appendChild(option);
+      })
+      monthDiv.appendChild(monthSelect);
+      firmsFilterDiv.appendChild(monthDiv);
+      
 
       const searchBtn = document.createElement('button');
-      searchBtn.id = 'firms-search';
+      searchBtn.id = 'hotspots-search';
       searchBtn.innerHTML = `<span><i class="fa fa-search"></i>&nbsp;${t('search')}</span>`;
       searchBtn.classList.add('search');
-      // searchBtn.addEventListener('click', event => {
-      //   const country = document.getElementsByName('firms_country')[0].value;
-      //   const year = document.getElementsByName('firms_year')[0].value;
 
-      //   console.log(country, year);
-      //   const url = `/firms/${year}/modis_${year}_${country}.csv`;
+      firmsFilterDiv.appendChild(searchBtn);
 
-      //   return fetch(url).then((res) => res.text().then((data) => csv_parse(data.trim(), {
-      //     columns: true,
-      //     from_line: 1
-      //   }, function (err, records) {
-      //     if (!err) {
-      //       console.log(records);
-      //     }
-      //   })))
-      // });
+      container.appendChild(firmsFilterDiv);
+      me.mapStyleContainer.appendChild(container);
+    }
+
+    const addStyleItemBurnedAreas = (style) => {
+      const container = document.createElement('div');
+      container.innerText = style.title;
+      container.classList.add(style.id);
+
+      // Add filters for searching FIRMS
+      const firmsFilterDiv = document.createElement('div');
+      firmsFilterDiv.id = 'burned-areas-filter-div';
+      firmsFilterDiv.style.padding = '5px';
+      firmsFilterDiv.style.height = '185px';
+      firmsFilterDiv.style.display = 'block';
+
+      const countryDiv = document.createElement('div');
+      countryDiv.classList.add('inner');
+      const countryLabel = document.createElement('label');
+      countryLabel.innerText = `${t('country')}:`;
+      countryDiv.appendChild(countryLabel);
+      const countrySelect = document.createElement('select');
+      countrySelect.name = 'burned_country';
+      countrySelect.style.float = 'right';
+      countries.forEach((country) => {
+        const option = document.createElement('option');
+        option.value = country.name;
+        option.innerText = country.name;
+        countrySelect.appendChild(option);
+      })
+      countryDiv.appendChild(countrySelect);
+      firmsFilterDiv.appendChild(countryDiv);
+
+      const today = new Date();
+      const yearDiv = document.createElement('div');
+      yearDiv.classList.add('inner');
+      const yearLabel = document.createElement('label');
+      yearLabel.innerText = `${t('year')}:`;
+      yearDiv.appendChild(yearLabel);
+      const yearSelect = document.createElement('select');
+      yearSelect.name = 'burned_year';
+      yearSelect.style.float = 'right';
+      Array(today.getFullYear() - 2000 + 1).fill().map((v, i) => i + 2000).forEach((year) => {
+        const option = document.createElement('option');
+        option.value = year;
+        option.innerText = year;
+        yearSelect.appendChild(option);
+      })
+      yearDiv.appendChild(yearSelect);
+      firmsFilterDiv.appendChild(yearDiv);
+      
+      const monthDiv = document.createElement('div');
+      monthDiv.classList.add('inner');
+      const monthLabel = document.createElement('label');
+      monthLabel.innerText = `${t('month')}:`;
+      monthDiv.appendChild(monthLabel);
+      const monthSelect = document.createElement('select');
+      monthSelect.name = 'burned_month';
+      monthSelect.multiple = true;
+      monthSelect.style.float = 'right';
+      monthSelect.style.height = '100px';
+      Array(12).fill().map((v, i) => i + 1).forEach((month) => {
+        const option = document.createElement('option');
+        option.value = month;
+        option.innerText = t(`months`)[month-1];
+        monthSelect.appendChild(option);
+      })
+      monthDiv.appendChild(monthSelect);
+      firmsFilterDiv.appendChild(monthDiv);
+      
+
+      const searchBtn = document.createElement('button');
+      searchBtn.id = 'burned-search';
+      searchBtn.innerHTML = `<span><i class="fa fa-search"></i>&nbsp;${t('search')}</span>`;
+      searchBtn.classList.add('search');
 
       firmsFilterDiv.appendChild(searchBtn);
 
@@ -289,8 +326,10 @@ export class SwitcherControl {
     }
 
     for (const style of me.styles) {
-      if (style.checkboxes) {
-        addStyleItemWithCheckboxes(style);
+      if (style.id === 'mapHotSpots') {
+        addStyleItemHotSpots(style);
+      } else if (style.id === 'mapBurnedAreas') {
+        addStyleItemBurnedAreas(style);
       } else {
         addStyleItemButton(style);
       }
