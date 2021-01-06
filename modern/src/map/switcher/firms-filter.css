@@ -29,6 +29,29 @@
   width: 150px;
   height: 24px;
 }
+.mapboxgl-ctrl-group .mapboxgl-filter-container div.inner ui {
+  float: right;
+  list-style-type:none;
+  height: 300px;
+  width: 160px;
+  padding: 5px;
+}
+
+.mapboxgl-ctrl-group .mapboxgl-filter-container div.inner ui li {
+  line-height: 24px;
+  display: flex;
+}
+.mapboxgl-ctrl-group .mapboxgl-filter-container div.inner ui li input[type=checkbox] {
+  width: 16px;
+  height: 16px;
+}
+.mapboxgl-ctrl-group .mapboxgl-filter-container div.inner ui li label {
+  flex: 1;
+  margin-left: 5px;
+  margin-top: 1px;
+  vertical-align: text-bottom;
+  color: white;
+}
 
 
 .mapboxgl-filter-container > button + button

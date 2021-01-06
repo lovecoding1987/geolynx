@@ -363,7 +363,7 @@ const FiresMap = () => {
             const type = document.getElementsByName('filter_type')[0].value;
             const country = document.getElementsByName('filter_country')[0].value;
             const year = document.getElementsByName('filter_year')[0].value;
-            const months = [...document.getElementsByName('filter_month')[0].options].filter(option=>option.selected).map(option => option.text);
+            const months = [...document.getElementsByName('filter_month')].filter(option=>option.checked).map(option => option.value);
 
             try {
                 dispatch(firesActions.setLoading(true));     

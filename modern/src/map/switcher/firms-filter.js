@@ -1,7 +1,7 @@
-import { isMobile } from 'react-device-detect';
 import './firms-filter.css';
 import countries from '../../common/countries';
 import t from '../../common/localization';
+import { colorByMonth } from '../mapUtil';
 
 
 export class FirmsFilter {
@@ -107,16 +107,23 @@ export class FirmsFilter {
     const monthLabel = document.createElement('label');
     monthLabel.innerText = `${t('month')}:`;
     monthDiv.appendChild(monthLabel);
-    const monthSelect = document.createElement('select');
-    monthSelect.name = 'filter_month';
-    monthSelect.multiple = true;
-    monthSelect.style.float = 'right';
-    if (!isMobile) monthSelect.style.height = '210px';
+    const monthSelect = document.createElement('ui');
     Array(12).fill().map((v, i) => i + 1).forEach((month) => {
-      const option = document.createElement('option');
-      option.value = month;
-      option.innerText = t(`months`)[month-1];
-      monthSelect.appendChild(option);
+      const optionLi = document.createElement('li');
+      //option.value = month;
+      //option.innerText = t(`months`)[month-1];
+      const optionCheckbox = document.createElement('input');
+      optionCheckbox.type = 'checkbox';
+      optionCheckbox.name = 'filter_month';
+      optionCheckbox.value = t(`months`)[month-1];
+      optionLi.appendChild(optionCheckbox);
+      
+      const optionLabel = document.createElement('label');
+      optionLabel.innerText = t('months')[month-1];
+      optionLabel.style.backgroundColor = colorByMonth(month);
+      optionLi.appendChild(optionLabel);
+
+      monthSelect.appendChild(optionLi);
     })
     monthDiv.appendChild(monthSelect);
     firmsFilterDiv.appendChild(monthDiv);
