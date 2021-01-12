@@ -39,8 +39,8 @@ export class FirmsFilter {
     });
 
     const btnIcon = document.createElement('i');
-    btnIcon.classList.add('fa');
-    btnIcon.classList.add('fa-search');
+    btnIcon.classList.add('fas');
+    btnIcon.classList.add('fa-fire');
     me.filterButton.appendChild(btnIcon);
 
     
